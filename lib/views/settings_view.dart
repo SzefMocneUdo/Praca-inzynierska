@@ -5,13 +5,12 @@ import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
 import 'dart:developer' as devtools show log;
 
-import 'package:untitled/navBar.dart';
 import 'package:untitled/views/currencies_view.dart';
 import 'package:untitled/views/expenses_view.dart';
 import 'package:untitled/views/main_view.dart';
 import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/profile_view.dart';
-import 'package:untitled/views/savings_view.dart';
+import 'package:untitled/views/goals_view.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key});
@@ -39,32 +38,6 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavBar(
-        onLogout: () async {
-          final shouldLogOut = await showLogOutDialog(context);
-          if (shouldLogOut) {
-            await FirebaseAuth.instance.signOut();
-            Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
-          }
-          devtools.log(shouldLogOut.toString());
-        },
-        onSettingsPressed: () {},
-        onMainScreenPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MainView()));
-        },
-        onExpensesPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ExpensesView()));
-        },
-        onCurrenciesPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CurrenciesView()));
-        },
-        onSavingsPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => SavingsView()));
-        },
-        onNotificationsPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationsView()));
-        },
-      ),
       appBar: AppBar(
         backgroundColor: Colors.purple,
         actions: [

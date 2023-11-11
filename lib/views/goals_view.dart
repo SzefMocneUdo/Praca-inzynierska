@@ -6,26 +6,26 @@ import 'dart:developer' as devtools show log;
 
 import 'package:untitled/main.dart';
 import 'package:untitled/views/profile_view.dart';
-import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 
 import 'currencies_view.dart';
+import 'expenses_view.dart';
 import 'main_view.dart';
 import 'notifications_view.dart';
 
-class ExpensesView extends StatefulWidget {
-  const ExpensesView({Key? key});
+class GoalsView extends StatefulWidget {
+  const GoalsView({Key? key});
 
   @override
-  State<ExpensesView> createState() => _ExpensesViewState();
+  State<GoalsView> createState() => _GoalsViewState();
 }
 
-class _ExpensesViewState extends State<ExpensesView> {
+class _GoalsViewState extends State<GoalsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expenses'),
+        title: const Text('Goals'),
         backgroundColor: Colors.purple,
         actions: [
           IconButton(

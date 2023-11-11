@@ -1,17 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:untitled/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
-import 'package:untitled/navBar.dart';
-import 'package:untitled/views/profile_view.dart';
-import 'package:untitled/views/savings_view.dart';
+import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 
+import '../bottomNavBar.dart';
 import 'currencies_view.dart';
 import 'expenses_view.dart';
+import 'home_view.dart';
 import 'notifications_view.dart';
 
 class MainView extends StatefulWidget {
@@ -22,58 +21,90 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  int _selectedIndex = 2;
+  final List<Widget> screens = [
+    CurrenciesView(),
+    ExpensesView(),
+    HomeView(),
+    GoalsView(),
+    SettingsView()
+  ];
+
+  final PageStorageBucket bucket = PageStorageBucket();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavBar(
-        onLogout: () async {
-          final shouldLogOut = await showLogOutDialog(context);
-          if (shouldLogOut) {
-            await FirebaseAuth.instance.signOut();
-            Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
-          }
-          devtools.log(shouldLogOut.toString());
+      body: PageStorage(
+        bucket: bucket,
+        child: screens[_selectedIndex],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          _showBottomMenu(context);
         },
-        onSettingsPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SettingsView(),
-          ));
-        }, onMainScreenPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => MainView(),
-        ));
-      },  onExpensesPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ExpensesView(),
-          ));
-      }, onCurrenciesPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => CurrenciesView(),
-          ));
-      }, onSavingsPressed: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => SavingsView(),
-        ));
-      }, onNotificationsPressed: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => NotificationsView(),
-        ));
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: _selectedIndex,
+        onTabChange: _onItemTapped,
+      ),
+    );
+  }
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _showBottomMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.money_off),
+                title: Text('Add new outcome'),
+                onTap: () {
+                  // Dodaj logikę dla opcji "Dodaj nowy wydatek"
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.attach_money),
+                title: Text('Add new income'),
+                onTap: () {
+                  // Dodaj logikę dla opcji "Dodaj nowy przychód"
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.credit_card),
+                title: Text('Attach new credit card'),
+                onTap: () {
+                  // Dodaj logikę dla opcji "Dodaj kartę kredytową"
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.flag),
+                title: Text('Add new saving goal'),
+                onTap: () {
+                  // Dodaj logikę dla opcji "Dodaj nowy cel"
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
       },
-      ),
-      appBar: AppBar(
-        title: const Text('Main UI'),
-        backgroundColor: Colors.purple,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => NotificationsView(),
-              ));
-            },
-          )
-        ],
-      ),
     );
   }
 }

@@ -12,7 +12,7 @@ import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/privacy_and_security_view.dart';
 import 'package:untitled/views/profile_view.dart';
 import 'package:untitled/views/register_view.dart';
-import 'package:untitled/views/savings_view.dart';
+import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 import 'package:untitled/views/verify_email_view.dart';
 import 'package:untitled/views/update_password_view.dart';
@@ -35,7 +35,7 @@ void main() {
       profileRoute: (context) => ProfileView(),
       expensesRoute: (context) => ExpensesView(),
       currenciesRoute: (context) => CurrenciesView(),
-      savingsRoute: (context) => SavingsView(),
+      goalsRoute: (context) => GoalsView(),
       notificationsRoute: (context) => NotificationsView(),
       settingsRoute: (context) => SettingsView(),
       privacyAndSecurityRoute: (context) => PrivacyAndSecurityView(),
@@ -55,15 +55,6 @@ class HomePage extends StatelessWidget {
         switch (snapshot.connectionState){
           case ConnectionState.done:
            final user = FirebaseAuth.instance.currentUser;
-           //if(user != null){
-             // if(user.emailVerified){
-             //   return const MainView();
-             // }
-             // else{
-             //   return VerifyEmailView();
-             // } //Wymóg weryfikacji tymczasowo wyłączony
-           //}
-           //else{
              return const LoginView();
            //}
           default:

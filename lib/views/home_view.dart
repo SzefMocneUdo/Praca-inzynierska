@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'notifications_view.dart';
 
-class CurrenciesView extends StatefulWidget {
-  const CurrenciesView({Key? key});
+class HomeView extends StatefulWidget {
+  const HomeView({Key? key});
 
   @override
-  State<CurrenciesView> createState() => _CurrenciesViewState();
+  State<HomeView> createState() => _HomeViewState();
 }
 
-class _CurrenciesViewState extends State<CurrenciesView> {
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currencies'),
+        title: const Text('Home'),
         backgroundColor: Colors.purple,
         actions: [
           IconButton(

@@ -53,8 +53,8 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyATR4Gb81llXNCm5_F1VuaU3zCNZmdb5Ek',
     appId: '1:714798005515:android:a76850911f8488f441360e',
     messagingSenderId: '714798005515',
-    projectId: 'untitled-81a0d',
-    storageBucket: 'untitled-81a0d.appspot.com',
+    projectId: 'inzynierka-db9e3',
+    storageBucket: 'inzynierka-db9e3.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

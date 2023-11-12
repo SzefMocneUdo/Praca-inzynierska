@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "552194130304",
-    "project_id": "untitled-81a0d",
-    "storage_bucket": "untitled-81a0d.appspot.com"
+    "project_number": "714798005515",
+    "project_id": "inzynierka-db9e3",
+    "storage_bucket": "inzynierka-db9e3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:552194130304:android:16a378e6e73c3d4fe94165",
+        "mobilesdk_app_id": "1:714798005515:android:a76850911f8488f441360e",
         "android_client_info": {
-          "package_name": "com.example.untitled"
+          "package_name": "com.project.project"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD2onk-ws5X_KdjoL11Plt2zHbW_zuaG8Q"
+          "current_key": "AIzaSyBYm29ERNL-kFcW5XssmgVziSLJL05Fr9M"
         }
       ],
       "services": {

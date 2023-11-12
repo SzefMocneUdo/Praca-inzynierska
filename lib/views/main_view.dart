@@ -8,6 +8,7 @@ import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 
 import '../bottomNavBar.dart';
+import 'addExpenseScreen.dart';
 import 'currencies_view.dart';
 import 'expenses_view.dart';
 import 'home_view.dart';
@@ -73,15 +74,17 @@ class _MainViewState extends State<MainView> {
                 leading: Icon(Icons.money_off),
                 title: Text('Add new outcome'),
                 onTap: () {
-                  // Dodaj logikę dla opcji "Dodaj nowy wydatek"
                   Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddExpenseScreen()),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.attach_money),
                 title: Text('Add new income'),
                 onTap: () {
-                  // Dodaj logikę dla opcji "Dodaj nowy przychód"
                   Navigator.pop(context);
                 },
               ),

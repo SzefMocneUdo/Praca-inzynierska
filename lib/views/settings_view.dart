@@ -72,7 +72,8 @@ class _SettingsViewState extends State<SettingsView> {
             buildNotificationOption("Notifications", valueNotifications, onChangeFunctionNotifications),
             buildNotificationOption("Dark theme", valueDarkTheme, onChangeFunctionDarkTheme),
             buildOption(context, "Privacy and Security", privacyAndSecurityRoute),
-            buildOption(context, "Help", helpRoute)
+            buildOption(context, "Help", helpRoute),
+            buildLogoutOption(context),
           ],
         ),
       ),
@@ -141,6 +142,42 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           )
         ],
+      ),
+    );
+  }
+  GestureDetector buildLogoutOption(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Implement logout functionality here
+        FirebaseAuth.instance.signOut();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+              (route) => false,
+        );
+
+      },
+      child: const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.exit_to_app,
+                  color: Colors.red, // Customize the color as needed
+                ),
+                SizedBox(width: 10),
+                Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.red), // Customize the color as needed
+                ),
+              ],
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }

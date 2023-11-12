@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:untitled/constants/routes.dart';
@@ -16,6 +17,7 @@ import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 import 'package:untitled/views/verify_email_view.dart';
 import 'package:untitled/views/update_password_view.dart';
+
 
 
 void main() {

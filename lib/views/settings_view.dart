@@ -7,7 +7,7 @@ import 'dart:developer' as devtools show log;
 
 import 'package:untitled/views/currencies_view.dart';
 import 'package:untitled/views/expenses_view.dart';
-import 'package:untitled/views/main_view.dart';
+import 'package:untitled/views/bottom_manu_view.dart';
 import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/profile_view.dart';
 import 'package:untitled/views/goals_view.dart';

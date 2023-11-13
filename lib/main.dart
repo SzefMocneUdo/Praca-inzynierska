@@ -8,7 +8,7 @@ import 'package:untitled/views/currencies_view.dart';
 import 'package:untitled/views/expenses_view.dart';
 import 'package:untitled/views/help_view.dart';
 import 'package:untitled/views/login_view.dart';
-import 'package:untitled/views/main_view.dart';
+import 'package:untitled/views/bottom_manu_view.dart';
 import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/privacy_and_security_view.dart';
 import 'package:untitled/views/profile_view.dart';

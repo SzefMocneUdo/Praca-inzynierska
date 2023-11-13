@@ -10,7 +10,7 @@ import 'package:untitled/views/settings_view.dart';
 
 import 'currencies_view.dart';
 import 'expenses_view.dart';
-import 'main_view.dart';
+import 'bottom_manu_view.dart';
 import 'notifications_view.dart';
 
 class GoalsView extends StatefulWidget {

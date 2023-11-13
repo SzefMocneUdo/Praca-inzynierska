@@ -1,26 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../model/Expense.dart';
+import 'expenseDetails.dart';
+import 'notifications_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../model/Expense.dart';
 import 'notifications_view.dart';
-
-class Expense {
-  final String userId;
-  final String date;
-  final double amount;
-  final String category;
-  final String description;
-
-  Expense({
-    required this.userId,
-    required this.date,
-    required this.amount,
-    required this.category,
-    required this.description,
-  });
-}
-
 class ExpensesView extends StatefulWidget {
   const ExpensesView({Key? key});
 
@@ -39,29 +30,32 @@ class _ExpensesViewState extends State<ExpensesView> {
 
   void _fetchExpenses() async {
     try {
-      // Pobierz aktualnie zalogowanego użytkownika
+      // Get the currently logged-in user
       User? user = FirebaseAuth.instance.currentUser;
 
-      // Sprawdź, czy użytkownik jest zalogowany
+      // Check if the user is logged in
       if (user != null) {
-        // Pobierz instancję Firestore
+        // Get the Firestore instance
         FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-        // Pobierz wszystkie dokumenty z kolekcji "expenses" dla danego użytkownika
+        // Get all documents from the "expenses" collection for the user
         QuerySnapshot querySnapshot = await firestore
             .collection('expenses')
             .where('userId', isEqualTo: user.uid)
             .get();
 
-        // Przekształć dane z dokumentów do listy wydatków
+        // Transform data from documents to a list of expenses
         List<Expense> userExpenses = querySnapshot.docs.map((doc) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+          // Perform null checks before accessing properties
           return Expense(
-            userId: data['userId'],
-            date: data['date'],
-            amount: data['amount'],
-            category: data['category'],
-            description: data['description'],
+            userId: data['userId'] ?? '',
+            name: data['name'] ?? '',
+            date: (data['date'] as Timestamp).toDate(),
+            amount: data['amount'] != null ? data['amount'].toDouble() : 0.0,
+            category: data['category'] ?? '',
+            description: data['description'] ?? '',
           );
         }).toList();
 
@@ -80,7 +74,7 @@ class _ExpensesViewState extends State<ExpensesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expenses'),
+        title: const Text('List of expenses'),
         backgroundColor: Colors.purple,
         actions: [
           IconButton(
@@ -93,15 +87,44 @@ class _ExpensesViewState extends State<ExpensesView> {
           )
         ],
       ),
-      body: ListView.builder(
-        itemCount: expenses.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text('Amount: ${expenses[index].amount}'),
-            subtitle: Text('Category: ${expenses[index].category}'),
-            // Dodaj inne pola, które chcesz wyświetlić
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text('List of expenses', style: TextStyle(fontSize: 20.0)),
+          ),
+          if (expenses.isEmpty)
+            Center(
+              child: Text('No expenses available'),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(expenses[index].name),
+                          SizedBox(width: 10),
+                          Text(':'),
+                          SizedBox(width: 10),
+                          Text('${expenses[index].amount}'),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      // Show expense details as a smaller dialog
+                      ExpenseDetailsDialog(expense: expenses[index]).show(context);
+                    },
+                  );
+                },
+              ),
+            ),
+        ],
       ),
     );
   }

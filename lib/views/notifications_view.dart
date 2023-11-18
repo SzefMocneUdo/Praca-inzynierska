@@ -10,7 +10,7 @@ import 'package:untitled/views/goals_view.dart';
 import 'package:untitled/views/settings_view.dart';
 
 import 'currencies_view.dart';
-import 'expenses_view.dart';
+import 'transactions_view.dart';
 import 'bottom_manu_view.dart';
 
 class NotificationsView extends StatefulWidget {
@@ -26,7 +26,7 @@ class _NotificationsViewState extends State<NotificationsView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),

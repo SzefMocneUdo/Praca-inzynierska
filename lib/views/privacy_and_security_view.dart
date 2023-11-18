@@ -17,7 +17,7 @@ class _PrivacyAndSecurityViewState extends State<PrivacyAndSecurityView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Privacy and Security'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         leading: GestureDetector(
           child: Icon( Icons.arrow_back_ios, color: Colors.black,  ),
           onTap: () {

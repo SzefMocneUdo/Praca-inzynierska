@@ -1,8 +1,6 @@
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
 import '../model/ExpenseData.dart';
 import 'notifications_view.dart';
@@ -16,13 +14,35 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   List<ExpenseData> expenseDataList = [];
+  List<ExpenseData> recentExpenses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecentExpenses();
+  }
+
+  void _fetchRecentExpenses() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('expenses')
+          .orderBy('date', descending: true)
+          .limit(3)
+          .get();
+
+      setState(() {
+        recentExpenses = prepareExpenseData(querySnapshot);
+      });
+    } catch (e) {
+      print('Error fetching recent expenses: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -34,20 +54,20 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Sekcja: Nagłówek
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Wykres wszystkich wydatków',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            // Sekcja: Nagłówek
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30.0),
+              child: Text(
+                'Wykres wszystkich wydatków',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          // Sekcja: Wykres z legendą
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            // Sekcja: Wykres z legendą
+            Expanded(
               child: FutureBuilder<QuerySnapshot>(
                 future: FirebaseFirestore.instance.collection('expenses').get(),
                 builder: (context, snapshot) {
@@ -57,7 +77,6 @@ class _HomeViewState extends State<HomeView> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     expenseDataList = prepareExpenseData(snapshot.data);
-
                     return Column(
                       children: [
                         Expanded(
@@ -84,29 +103,35 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 16),
                         // Sekcja: Legenda
-                        Wrap(
-                          spacing: 16.0,
-                          children: expenseDataList.map((expense) {
-                            return Row(
-                              children: [
-                                Container(
-                                  width: 16,
-                                  height: 16,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: getColor(expenseDataList.indexOf(expense)),
-                                  ),
+                        Container(
+                          height: 50,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: expenseDataList.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: getColor(index),
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      '${expenseDataList[index].category}: ${(expenseDataList[index].amount / getTotalAmount(expenseDataList) * 100).toStringAsFixed(2)}%',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 8),
-                                Text(
-                                  '${expense.category}: ${(expense.amount / getTotalAmount(expenseDataList) * 100).toStringAsFixed(2)}%',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     );
@@ -114,43 +139,46 @@ class _HomeViewState extends State<HomeView> {
                 },
               ),
             ),
-          ),
-          // Sekcja: Lista ostatnich 3 wydatków
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Ostatnie 3 wydatki:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                FutureBuilder<QuerySnapshot>(
-                  future: FirebaseFirestore.instance.collection('expenses').orderBy('date', descending: true).limit(3).get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else {
-                      List<ExpenseData> recentExpenses = prepareExpenseData(snapshot.data);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: recentExpenses.map((expense) {
-                          return Text(
-                            '${expense.category}: ${expense.amount}',
-                            style: TextStyle(fontSize: 16),
-                          );
-                        }).toList(),
+            // Sekcja: Lista ostatnich 2 wydatków
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ostatnie 2 wydatki:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  DataTable(
+                    columns: [
+                      DataColumn(label: Text('Kategoria')),
+                      DataColumn(label: Text('Kwota')),
+                    ],
+                    rows: recentExpenses.map((expense) {
+                      return DataRow(
+                        cells: [
+                          DataCell(
+                            Text(
+                              expense.category,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              expense.amount.toString(),
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
                       );
-                    }
-                  },
-                ),
-              ],
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -163,13 +191,14 @@ class _HomeViewState extends State<HomeView> {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         String category = data['category'] ?? 'Unknown';
         double amount = data['amount'] != null ? data['amount'].toDouble() : 0.0;
+        String currency = data['currency'] ?? '';
 
         int existingIndex = expenseDataList.indexWhere((element) => element.category == category);
 
         if (existingIndex != -1) {
           expenseDataList[existingIndex].amount += amount;
         } else {
-          expenseDataList.add(ExpenseData(category, amount));
+          expenseDataList.add(ExpenseData(category, amount,currency));
         }
       });
     }
@@ -274,8 +303,7 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Category: ${expense.category}'),
-              Text('Amount: ${expense.amount}'),
-              Text('Percentage: ${(expense.amount / getTotalAmount(expenseDataList) * 100).toStringAsFixed(2)}%'),
+              Text('Number of Expenses: ${getNumberOfExpenses(expense)}'),
             ],
           ),
           actions: [
@@ -290,4 +318,13 @@ class _HomeViewState extends State<HomeView> {
       },
     );
   }
+
+  int getNumberOfExpenses(ExpenseData expense) {
+    int numberOfExpenses = expenseDataList
+        .where((element) => element.category == expense.category)
+        .length;
+
+    return numberOfExpenses;
+  }
+
 }

@@ -5,7 +5,7 @@ import 'package:untitled/constants/routes.dart';
 import 'package:untitled/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled/views/currencies_view.dart';
-import 'package:untitled/views/expenses_view.dart';
+import 'package:untitled/views/transactions_view.dart';
 import 'package:untitled/views/help_view.dart';
 import 'package:untitled/views/login_view.dart';
 import 'package:untitled/views/bottom_manu_view.dart';
@@ -23,9 +23,8 @@ import 'package:untitled/views/update_password_view.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
-    title: 'Flutter Demo',
     theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
       useMaterial3: true,
     ),
     home: const HomePage(),
@@ -35,7 +34,7 @@ void main() {
       verifyEmailRoute: (context) => VerifyEmailView(),
       mainRoute: (context) => MainView(),
       profileRoute: (context) => ProfileView(),
-      expensesRoute: (context) => ExpensesView(),
+      transactionsRoute: (context) => Transactions(),
       currenciesRoute: (context) => CurrenciesView(),
       goalsRoute: (context) => GoalsView(),
       notificationsRoute: (context) => NotificationsView(),
@@ -69,22 +68,4 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Future<bool> showLogOutDialog(BuildContext context){
-  return showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Log out'),
-        content: const Text('Are You sure that You want to log out?'),
-        actions: [
-          TextButton(onPressed: () {
-            Navigator.of(context).pop(false);
-          }, child: const Text('Cancel')),
-          TextButton(onPressed: () {
-            Navigator.of(context).pop(true);
-          }, child: const Text('Log out'))
-        ],
-      );
-    },
-  ).then((value) => value ?? false);
-}
+

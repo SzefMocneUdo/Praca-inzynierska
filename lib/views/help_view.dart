@@ -17,7 +17,7 @@ class _HelpViewState extends State<HelpView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Help'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         leading: GestureDetector(
           child: Icon( Icons.arrow_back_ios, color: Colors.black,  ),
           onTap: () {

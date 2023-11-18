@@ -15,7 +15,7 @@ class _CurrenciesViewState extends State<CurrenciesView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Currencies'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),

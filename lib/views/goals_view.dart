@@ -9,7 +9,7 @@ import 'package:untitled/views/profile_view.dart';
 import 'package:untitled/views/settings_view.dart';
 
 import 'currencies_view.dart';
-import 'expenses_view.dart';
+import 'transactions_view.dart';
 import 'bottom_manu_view.dart';
 import 'notifications_view.dart';
 
@@ -26,7 +26,7 @@ class _GoalsViewState extends State<GoalsView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Goals'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),

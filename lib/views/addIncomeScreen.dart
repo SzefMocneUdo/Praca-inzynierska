@@ -1,27 +1,24 @@
-// AddExpenseScreen class
+// AddIncomeScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../model/Currency.dart';
 
-class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({Key? key}) : super(key: key);
+class AddIncomeScreen extends StatefulWidget {
+  const AddIncomeScreen({Key? key}) : super(key: key);
 
   @override
-  _AddExpenseScreenState createState() => _AddExpenseScreenState();
+  _AddIncomeScreenState createState() => _AddIncomeScreenState();
 }
 
-class _AddExpenseScreenState extends State<AddExpenseScreen> {
+class _AddIncomeScreenState extends State<AddIncomeScreen> {
   TextEditingController _nameController = TextEditingController();
   DateTime? _selectedDate;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
   Currency? selectedCurrency;
-  TextEditingController _categoryController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
-  String? selectedPaymentMethod;
-  List<String> paymentMethods = ['Cash', 'Card'];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -36,8 +33,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Expense'),
-        backgroundColor: Colors.blueAccent,
+        title: Text('Add New Income'),
+        backgroundColor: Colors.blueAccent, // Zmiana koloru dla przychodów
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -70,7 +67,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     setState(() {
                       _selectedDate = pickedDate;
                       _dateController.text =
-                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },
@@ -126,42 +123,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 },
               ),
               SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: selectedPaymentMethod,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedPaymentMethod = newValue;
-                  });
-                },
-                items: paymentMethods.map<DropdownMenuItem<String>>((String method) {
-                  return DropdownMenuItem<String>(
-                    value: method,
-                    child: Text(method),
-                  );
-                }).toList(),
-                decoration: InputDecoration(labelText: 'Payment Method'),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Payment Method is required';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _categoryController,
-                decoration: InputDecoration(labelText: 'Category'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Category is required';
-                  }
-                  if (!RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-                    return 'Only letters are allowed';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: 'Description'),
@@ -170,10 +131,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    _addExpense();
+                    _addIncome();
                   }
                 },
-                child: Text('Add Expense'),
+                child: Text('Add Income'),
               ),
             ],
           ),
@@ -182,30 +143,28 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
   }
 
-  void _addExpense() {
+  void _addIncome() {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
         FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-        firestore.collection('expenses').add({
+        firestore.collection('incomes').add({
           'userId': user.uid,
           'name': _nameController.text,
           'date': _selectedDate,
           'amount': double.parse(_amountController.text),
-          'category': _categoryController.text,
           'description': _descriptionController.text,
           'currency': selectedCurrency?.code,
-          'paymentMethod': selectedPaymentMethod,
         });
 
-        print('Expense added successfully!');
+        print('Income added successfully!');
       } else {
         print('User not logged in.');
       }
     } catch (e) {
-      print('Error adding expense: $e');
+      print('Error adding income: $e');
     }
 
     Navigator.pop(context);

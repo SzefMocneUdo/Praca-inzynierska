@@ -2,12 +2,12 @@
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 //
-// import '../model/Expense.dart';
+// import '../model/Income.dart';
 //
-// class ExpenseDetailsDialog {
-//   final Expense expense;
+// class IncomeDetailsDialog {
+//   final Income income;
 //
-//   ExpenseDetailsDialog({required this.expense});
+//   IncomeDetailsDialog({required this.income});
 //
 //   void show(BuildContext context) {
 //     showDialog(
@@ -20,13 +20,13 @@
 //               crossAxisAlignment: CrossAxisAlignment.stretch,
 //               mainAxisSize: MainAxisSize.min,
 //               children: [
-//                 Text('Expense Details', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+//                 Text('Income Details', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
 //                 SizedBox(height: 10),
-//                 Text('Name: ${expense.name}'),
-//                 Text('Date: ${DateFormat('dd/MM/yyyy').format(expense.date)}'),
-//                 Text('Amount: ${expense.amount}'),
-//                 Text('Category: ${expense.category}'),
-//                 Text('Description: ${expense.description}'),
+//                 Text('Name: ${income.name}'),
+//                 Text('Date: ${DateFormat('dd/MM/yyyy').format(income.date)}'),
+//                 Text('Amount: ${income.amount}'),
+//                 Text('Category: ${income.category}'),
+//                 Text('Description: ${income.description}'),
 //                 SizedBox(height: 10),
 //                 ElevatedButton(
 //                   onPressed: () {

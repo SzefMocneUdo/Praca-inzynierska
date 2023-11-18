@@ -6,7 +6,7 @@ import 'package:untitled/main.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:untitled/views/currencies_view.dart';
-import 'package:untitled/views/expenses_view.dart';
+import 'package:untitled/views/transactions_view.dart';
 import 'package:untitled/views/bottom_manu_view.dart';
 import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/profile_view.dart';
@@ -39,7 +39,7 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -83,28 +83,7 @@ class _SettingsViewState extends State<SettingsView> {
   GestureDetector buildOption(BuildContext context, String title, String routeName) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, routeName);        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: Text(title),
-        //       content: Column(
-        //         mainAxisSize: MainAxisSize.min,
-        //         children: [
-        //           Text("Option 1"),
-        //           Text("Option 2"),
-        //         ],
-        //       ),
-        //       actions: [
-        //         TextButton(
-        //           onPressed: () {
-        //                            },
-        //           child: Text("Close"),
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
+        Navigator.pushNamed(context, routeName);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -147,15 +126,17 @@ class _SettingsViewState extends State<SettingsView> {
   }
   GestureDetector buildLogoutOption(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Implement logout functionality here
-        FirebaseAuth.instance.signOut();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-              (route) => false,
-        );
-
+      onTap: () async {
+        bool confirmLogout = await showLogOutDialog(context);
+        if (confirmLogout) {
+          // Implement logout functionality here
+          FirebaseAuth.instance.signOut();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+                (route) => false,
+          );
+        }
       },
       child: const Padding(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -181,5 +162,27 @@ class _SettingsViewState extends State<SettingsView> {
       ),
     );
   }
+
+
+  Future<bool> showLogOutDialog(BuildContext context){
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Log out'),
+          content: const Text('Are You sure that You want to log out?'),
+          actions: [
+            TextButton(onPressed: () {
+              Navigator.of(context).pop(false);
+            }, child: const Text('Cancel')),
+            TextButton(onPressed: () {
+              Navigator.of(context).pop(true);
+            }, child: const Text('Log out'))
+          ],
+        );
+      },
+    ).then((value) => value ?? false);
+  }
+
 }
 

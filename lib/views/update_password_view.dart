@@ -19,7 +19,7 @@ class _UpdatePasswordViewState extends State<UpdatePasswordView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.blueAccent,
           leading: GestureDetector(
             child: Icon(Icons.arrow_back_ios, color: Colors.black,),
             onTap: () {

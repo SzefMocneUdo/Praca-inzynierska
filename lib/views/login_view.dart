@@ -5,7 +5,7 @@ import 'dart:developer' as devtools show log;
 import 'package:untitled/constants/routes.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -19,6 +19,8 @@ class _LoginViewState extends State<LoginView> {
   Color emailIconColor = Colors.grey;
   Color passwordIconColor = Colors.grey;
 
+  String? loginErrorMessage;
+
   @override
   void initState() {
     _email = TextEditingController();
@@ -31,6 +33,26 @@ class _LoginViewState extends State<LoginView> {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _showErrorDialog(String errorMessage) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildTextField({
@@ -77,6 +99,7 @@ class _LoginViewState extends State<LoginView> {
               emailIconColor = Colors.grey;
               passwordIconColor = Colors.blue;
             }
+            loginErrorMessage = null; // Reset the error message when the user taps on the text field
           });
         },
       ),
@@ -92,14 +115,14 @@ class _LoginViewState extends State<LoginView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 200, // dostosuj szerokość do swoich potrzeb
-              height: 200, // dostosuj wysokość do swoich potrzeb
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
                 image: const DecorationImage(
-                  image: AssetImage('lib/assets/ic_logo.png'), // Dodaj ścieżkę do swojego zdjęcia
+                  image: AssetImage('lib/assets/ic_logo.png'),
                   fit: BoxFit.cover,
                 ),
-                borderRadius: BorderRadius.circular(0.0), // dostosuj do swoich potrzeb
+                borderRadius: BorderRadius.circular(0.0),
                 border: Border.all(color: Colors.white, width: 2.0),
               ),
             ),
@@ -135,10 +158,8 @@ class _LoginViewState extends State<LoginView> {
                 try {
                   final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
                   if (userCredential.user?.emailVerified ?? false) {
-                    // Jeśli e-mail jest zweryfikowany, przejdź do strony głównej
                     Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
                   } else {
-                    // Jeśli e-mail nie jest zweryfikowany, wyświetl komunikat
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -149,8 +170,6 @@ class _LoginViewState extends State<LoginView> {
                             Center(
                               child: TextButton(
                                 onPressed: () {
-                                  // Tutaj dodaj logikę do wysłania ponownego e-maila weryfikacyjnego
-                                  // Na przykład możesz użyć FirebaseAuth.instance.currentUser?.sendEmailVerification();
                                   Navigator.of(context).pop();
                                 },
                                 child: Text('Send verification email'),
@@ -160,13 +179,15 @@ class _LoginViewState extends State<LoginView> {
                         );
                       },
                     );
-
                   }
                 } on FirebaseAuthException catch (e) {
-                  if (e.code == 'user-not-found') {
-                    devtools.log('User not found');
-                  } else if (e.code == 'wrong-password') {
-                    devtools.log('Wrong password');
+                  if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+                    setState(() {
+                      loginErrorMessage = 'Incorrect login credentials';
+                    });
+                    Future.delayed(Duration.zero, () {
+                      _showErrorDialog(loginErrorMessage!);
+                    });
                   }
                 }
               },

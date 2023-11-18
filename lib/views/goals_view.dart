@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'EditGoalPanel.dart';
+
 class VirtualPiggyBank {
   final String userId;
   final String name;
@@ -59,7 +61,68 @@ class _GoalsViewState extends State<GoalsView> {
             return ListView.builder(
               itemCount: userGoals.length,
               itemBuilder: (context, index) {
-                return _buildPiggyBankCard(userGoals[index]);
+                return Dismissible(
+                  key: Key(userGoals[index].id),
+                  background: Container(
+                    color: Colors.green, // Zmiana koloru na zielony
+                    child: Icon(
+                      Icons.edit, // Zmiana ikony na olówek
+                      color: Colors.white,
+                      size: 36.0,
+                    ),
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(left: 16.0),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red, // Zmiana koloru na czerwony
+                    child: Icon(
+                      Icons.delete, // Zmiana ikony na kosz
+                      color: Colors.white,
+                      size: 36.0,
+                    ),
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.only(right: 16.0),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (direction == DismissDirection.endToStart) {
+                      // Confirm deletion
+                      return await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Delete Goal?'),
+                            content: Text('Are you sure you want to delete this goal?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else if (direction == DismissDirection.startToEnd) {
+                      // Edit goal
+                      _editGoal(userGoals[index]);
+                    }
+                    return false;
+                  },
+                  onDismissed: (direction) {
+                    if (direction == DismissDirection.endToStart) {
+                      // Delete goal
+                      _deleteGoal(userGoals[index]);
+                    }
+                  },
+                  child: _buildPiggyBankCard(userGoals[index]),
+                );
               },
             );
           }
@@ -114,91 +177,26 @@ class _GoalsViewState extends State<GoalsView> {
       }
     }
 
-    return Dismissible(
-      key: Key(piggyBank.id),
-      background: Container(
-        color: Colors.red,
-        child: Icon(
-          Icons.delete,
-          color: Colors.white,
-          size: 36.0,
-        ),
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 16.0),
-      ),
-      secondaryBackground: Container(
-        color: Colors.green,
-        child: Icon(
-          Icons.edit,
-          color: Colors.white,
-          size: 36.0,
-        ),
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.only(left: 16.0),
-      ),
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.endToStart) {
-          // Confirm deletion
-          return await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Delete Goal?'),
-                content: Text('Are you sure you want to delete this goal?'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    child: Text('Delete'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else if (direction == DismissDirection.startToEnd) {
-          // Navigate to the edit screen
-          // Replace with your navigation logic
-          return false;
-        }
-        return false;
-      },
-      onDismissed: (direction) {
-        if (direction == DismissDirection.endToStart) {
-          // Delete goal
-          _deleteGoal(piggyBank);
-        } else if (direction == DismissDirection.startToEnd) {
-          // Navigate to the edit screen
-          // Replace with your navigation logic
-        }
-      },
-      child: Card(
-        margin: EdgeInsets.all(8.0),
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                piggyBank.name,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8.0),
-              _buildAmountInfo(piggyBank),
-              SizedBox(height: 8.0),
-              LinearProgressIndicator(
-                value: progressPercentage / 100,
-                color: Colors.blueAccent,
-                backgroundColor: Colors.grey[300],
-              ),
-            ],
-          ),
+    return Card(
+      margin: EdgeInsets.all(8.0),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              piggyBank.name,
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8.0),
+            _buildAmountInfo(piggyBank),
+            SizedBox(height: 8.0),
+            LinearProgressIndicator(
+              value: progressPercentage / 100,
+              color: Colors.blueAccent,
+              backgroundColor: Colors.grey[300],
+            ),
+          ],
         ),
       ),
     );
@@ -239,5 +237,19 @@ class _GoalsViewState extends State<GoalsView> {
     } catch (error) {
       print('Error deleting goal: $error');
     }
+  }
+
+  void _editGoal(VirtualPiggyBank piggyBank) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditGoalPanel(
+          goalId: piggyBank.id,
+          initialName: piggyBank.name,
+          initialTargetAmount: piggyBank.targetAmount,
+          initialCurrentAmount: piggyBank.currentAmount,
+          initialCurrency: piggyBank.currency,
+        ),
+      ),
+    );
   }
 }

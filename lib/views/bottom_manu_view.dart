@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/views/settings_view.dart';
 
 import 'addExpenseScreen.dart';
+import 'addFinancialGoalScreen.dart';
 import 'addIncomeScreen.dart';
 import 'currencies_view.dart';
 import 'transactions_view.dart';
@@ -119,9 +120,29 @@ class _MainViewState extends State<MainView> {
               ListTile(
                 leading: Icon(Icons.flag),
                 title: Text('Add new saving goal'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  // Add your navigation logic
+                  // Przejdź do ekranu dodawania celu
+                  bool goalAdded = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddGoalScreen(),
+                    ),
+                  );
+
+                  // Sprawdź, czy cel został pomyślnie dodany
+                  if (goalAdded != null && goalAdded) {
+                    // Wyświetl komunikat o pomyślnym dodaniu celu
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Goal added successfully!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
+                    // Przejdź z powrotem do HomeView lub dowolnego innego widoku
+                    _onItemTapped(2);
+                  }
                 },
               ),
             ],

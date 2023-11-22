@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:live_currency_rate/live_currency_rate.dart';
 import 'package:untitled/views/currencies_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class CurrencyConvrterScreen extends StatefulWidget {
-  const CurrencyConvrterScreen({Key? key}) : super(key: key);
+import '../model/CurrencyRate.dart';
+
+
+
+class FollowExchangeRatesScreen extends StatefulWidget {
+  const FollowExchangeRatesScreen({Key? key}) : super(key: key);
 
   @override
-  State<CurrencyConvrterScreen> createState() => _CurrencyConvrterScreenState();
+  State<FollowExchangeRatesScreen> createState() =>
+      _FollowExchangeRatesScreenState();
 }
 
-class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
+class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   List<String> currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "PLN"];
   String _fromController = "USD";
   String _toController = "EUR";
-  TextEditingController _amountController = TextEditingController();
-  double _exchangeRateController = 0.0;
-  double _resultController = 0.0;
+  List<CurrencyRate> savedCurrencies = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Currency Converter'),
+          title: const Text('Follow Exchange Rates'),
           backgroundColor: Colors.blueAccent,
           leading: GestureDetector(
             child: Icon(
@@ -79,7 +82,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _fromController,
                   onChanged: (String? newValue) {
@@ -88,7 +91,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                     });
                   },
                   items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
+                      currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -128,7 +131,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _toController,
                   onChanged: (String? newValue) {
@@ -137,7 +140,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                     });
                   },
                   items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
+                      currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -146,57 +149,22 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 ),
               ),
               SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, top: 8),
-                child: Text(
-                  'Amount:',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 5),
-              Container(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                  ),
-                  style: TextStyle(
-                    fontSize: 20, // Powiększenie tekstu pola
-                  ),
-                ),
-                width: 300,
-              ),
-
-              SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
-                  String amountText = _amountController.text;
-                  double amount = double.tryParse(amountText) ?? 0.0;
-                  CurrencyRate rate = await LiveCurrencyRate.convertCurrency(
-                      _fromController, _toController, amount);
-                  _exchangeRateController = rate.result / amount;
-                  setState(() {
-                    _resultController = rate.result;
-                  });
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('fromCurrency', _fromController);
+                  await prefs.setString('toCurrency', _toController);
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (BuildContext context) => CurrenciesView()),
+                  );
                 },
                 child: Text(
-                  'Convert',
+                  'Save',
                   style: TextStyle(fontSize: 20),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
-                "Exchange rate: " + _exchangeRateController.toStringAsFixed(2),
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(height: 40),
-              Text(
-                _resultController.toStringAsFixed(2),
-                style: TextStyle(fontSize: 50),
-              )
             ],
           ),
         ));

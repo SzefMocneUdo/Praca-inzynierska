@@ -11,3 +11,4 @@ const settingsRoute = '/settings/';
 const privacyAndSecurityRoute = '/privacy-and-security/';
 const helpRoute = '/help/';
 const updatePasswordRoute = '/update-password-route/';
+const creditCard = '/addingCard/';

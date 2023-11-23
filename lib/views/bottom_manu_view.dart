@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/views/settings_view.dart';
 
+import 'addCreditCardScreen.dart';
 import 'addExpenseScreen.dart';
 import 'addFinancialGoalScreen.dart';
 import 'addIncomeScreen.dart';
@@ -114,7 +115,10 @@ class _MainViewState extends State<MainView> {
                 title: Text('Attach new credit card'),
                 onTap: () {
                   Navigator.pop(context);
-                  // Add your navigation logic
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddCreditCardScreen()),
+                  );
                 },
               ),
               ListTile(

@@ -12,6 +12,6 @@ const privacyAndSecurityRoute = '/privacy-and-security/';
 const helpRoute = '/help/';
 const updatePasswordRoute = '/update-password-route/';
 const creditCard = '/addingCard/';
-const String cardsRoute = "/cards";
-const String calendarRoute = "/calendar";
+const String cardsRoute = "/cards/";
+const String calendarRoute = "/calendar/";
 

@@ -41,6 +41,7 @@ dependencies:
   credit_card_validator: ^2.1.0
   awesome_card: ^1.1.7
   flutter_svg: ^2.0.9
+  flip_card: ^0.7.0
 #  awesome_card: ^1.1.7
 
   # The following adds the Cupertino Icons font to your application.

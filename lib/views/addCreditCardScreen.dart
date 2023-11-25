@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:awesome_card/awesome_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:untitled/main.dart';
-import 'package:untitled/views/home_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import 'card_components/card_style_picker.dart';
+import 'card_components/card_styles.dart';
 import 'card_components/card_utilis.dart';
 import 'card_components/input_formatters.dart';
-
 
 class AddCreditCardScreen extends StatefulWidget {
   @override
@@ -29,6 +28,9 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
   FocusNode cvvFocusNode = FocusNode();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Widget? selectedCardStyle;
+
 
   @override
   void initState() {
@@ -87,7 +89,7 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
           "New Card",
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.blueAccent,  // Set the background color to blue
+        backgroundColor: Colors.blueAccent, // Set the background color to blue
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -106,15 +108,28 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                 cardHolderName: fullNameController.text,
                 cvv: cvvController.text,
                 showBackSide: showBack,
-                frontBackground: CardBackgrounds.black,
-                backBackground: CardBackgrounds.white,
+                frontBackground: selectedCardStyle ??
+                    CardStyles.customGradient(CardStyles.blueGradient),
+                backBackground: selectedCardStyle ??
+                    CardStyles.customGradient(CardStyles.blueGradient),
                 showShadow: true,
                 textExpDate: 'Exp. Date',
                 textName: 'Card Holder',
                 textExpiry: 'MM/YY',
+                frontTextColor: Colors.black,
               ),
             ),
             const SizedBox(height: 20.0),
+            SizedBox(height: 20.0),
+            // Card Style Picker
+            CardStylePicker(
+              onStyleSelected: (selectedStyle) {
+                setState(() {
+                  selectedCardStyle = selectedStyle;
+                });
+              },
+            ),
+            SizedBox(height: 20.0),
             Row(
               children: [
                 Expanded(
@@ -239,7 +254,8 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
             ElevatedButton(
               onPressed: () async {
                 // Validate card number
-                String? cardNumValidation = CardUtils.validateCardNum(cardNumberController.text);
+                String? cardNumValidation =
+                CardUtils.validateCardNum(cardNumberController.text);
 
                 if (cardNumValidation != null) {
                   // Handle invalid card number
@@ -248,7 +264,8 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                 }
 
                 // Validate CVV
-                String? cvvValidation = CardUtils.validateCVV(cvvController.text);
+                String? cvvValidation =
+                CardUtils.validateCVV(cvvController.text);
 
                 if (cvvValidation != null) {
                   // Handle invalid CVV
@@ -257,7 +274,8 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                 }
 
                 // Validate expiry date
-                String? dateValidation = CardUtils.validateDate(expiryDateController.text);
+                String? dateValidation =
+                CardUtils.validateDate(expiryDateController.text);
 
                 if (dateValidation != null) {
                   // Handle invalid expiry date
@@ -287,12 +305,13 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
 
                 // If all validations pass, proceed with adding the card
                 PaymentCard paymentCard = PaymentCard(
-                  type: cardType,
-                  number: cardNumberController.text,
-                  name: fullNameController.text,
-                  month: CardUtils.getExpiryDate(expiryDateController.text)[0],
-                  year: CardUtils.getExpiryDate(expiryDateController.text)[1],
-                  cvv: cvvController.text,
+                    type: cardType!,
+                    number: cardNumberController.text,
+                    name: fullNameController.text,
+                    month: CardUtils.getExpiryDate(
+                        expiryDateController.text)[0],
+                    year: CardUtils.getExpiryDate(expiryDateController.text)[1],
+                    cvv: cvvController.text,
                 );
 
                 // Save to Firebase
@@ -308,11 +327,11 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
 
                   // Show success dialog
                   Navigator.pop(context);
-
                 } catch (error) {
                   // Handle errors
                   print('Error saving to Firebase: $error');
-                  showErrorDialog(context, 'Error', 'Failed to save card. Please try again.');
+                  showErrorDialog(context, 'Error',
+                      'Failed to save card. Please try again.');
                 }
               },
               child: Text('Add'),
@@ -386,4 +405,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
       },
     );
   }
+
+
 }

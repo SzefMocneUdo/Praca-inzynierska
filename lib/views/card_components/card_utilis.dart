@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'card_strings.dart';
 
+import 'package:flutter/material.dart';
+
 class PaymentCard {
   CardType? type;
   String? number;
@@ -12,14 +14,21 @@ class PaymentCard {
   int? year;
   String? cvv;
 
-  PaymentCard(
-      {this.type, this.number, this.name, this.month, this.year, this.cvv});
+  PaymentCard({
+    this.type,
+    this.number,
+    this.name,
+    this.month,
+    this.year,
+    this.cvv,
+  });
 
   @override
   String toString() {
     return '[Type: $type, Number: $number, Name: $name, Month: $month, Year: $year, CVV: $cvv]';
   }
 }
+
 
 class CardUtils {
   static String? validateCVV(String? value) {

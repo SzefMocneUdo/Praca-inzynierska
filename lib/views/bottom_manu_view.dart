@@ -113,11 +113,13 @@ class _MainViewState extends State<MainView> {
               ListTile(
                 leading: Icon(Icons.credit_card),
                 title: Text('Attach new credit card'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Navigator.push(
+                  await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AddCreditCardScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => AddCreditCardScreen(),
+                    ),
                   );
                 },
               ),

@@ -39,6 +39,7 @@ dependencies:
   crypto: ^3.0.1
   url_launcher: ^6.2.1
   credit_card_validator: ^2.1.0
+  awesome_card: ^1.1.7
   flutter_svg: ^2.0.9
 #  awesome_card: ^1.1.7
 
@@ -71,7 +72,9 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/images/
+    - lib/assets/icons/
+    - lib/assets/
+    - lib/assets/card_provider/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

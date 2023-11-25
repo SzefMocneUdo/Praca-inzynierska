@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/views/followExchangeRatesScreen.dart';
+import 'currencyConverterScreen.dart';
 import 'notifications_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';

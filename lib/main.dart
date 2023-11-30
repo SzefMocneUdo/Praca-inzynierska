@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:untitled/views/CardListView.dart';
+import 'package:untitled/views/addCreditCardScreen.dart';
 import 'package:untitled/views/currencies_view.dart';
 import 'package:untitled/views/transactions_view.dart';
 import 'package:untitled/views/help_view.dart';
@@ -41,7 +43,9 @@ void main() {
       settingsRoute: (context) => SettingsView(),
       privacyAndSecurityRoute: (context) => PrivacyAndSecurityView(),
       helpRoute: (context) => HelpView(),
-      updatePasswordRoute: (context) => UpdatePasswordView()
+      updatePasswordRoute: (context) => UpdatePasswordView(),
+      creditCard: (context) => AddCreditCardScreen(),
+      cardsRoute: (context) => CardListView()
     },
   ));
 }

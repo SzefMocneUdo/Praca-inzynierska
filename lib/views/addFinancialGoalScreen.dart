@@ -125,6 +125,7 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Financial Goal'),
+        backgroundColor: Colors.blueAccent,  // Set the background color to blue
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

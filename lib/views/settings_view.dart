@@ -3,14 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
-import 'dart:developer' as devtools show log;
-
-import 'package:untitled/views/currencies_view.dart';
-import 'package:untitled/views/transactions_view.dart';
-import 'package:untitled/views/bottom_manu_view.dart';
 import 'package:untitled/views/notifications_view.dart';
-import 'package:untitled/views/profile_view.dart';
-import 'package:untitled/views/goals_view.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key});
@@ -68,11 +61,23 @@ class _SettingsViewState extends State<SettingsView> {
               ],
             ),
             Divider(),
-            buildOption(context, "Profile Settings", profileRoute),
+            buildOption(context, "Profile", () {
+              Navigator.pushNamed(context, profileRoute);
+            }),
+            buildOption(context, "Cards", () {
+              Navigator.pushNamed(context, cardsRoute);
+            }),
+            buildOption(context, "Calendar", () {
+              Navigator.pushNamed(context, calendarRoute);
+            }),
             buildNotificationOption("Notifications", valueNotifications, onChangeFunctionNotifications),
             buildNotificationOption("Dark theme", valueDarkTheme, onChangeFunctionDarkTheme),
-            buildOption(context, "Privacy and Security", privacyAndSecurityRoute),
-            buildOption(context, "Help", helpRoute),
+            buildOption(context, "Privacy and Security", () {
+              Navigator.pushNamed(context, privacyAndSecurityRoute);
+            }),
+            buildOption(context, "Help", () {
+              Navigator.pushNamed(context, helpRoute);
+            }),
             buildLogoutOption(context),
           ],
         ),
@@ -80,11 +85,9 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  GestureDetector buildOption(BuildContext context, String title, String routeName) {
+  GestureDetector buildOption(BuildContext context, String title, VoidCallback onTap) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, routeName);
-      },
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         child: Row(
@@ -124,6 +127,7 @@ class _SettingsViewState extends State<SettingsView> {
       ),
     );
   }
+
   GestureDetector buildLogoutOption(BuildContext context) {
     return GestureDetector(
       onTap: () async {
@@ -152,7 +156,7 @@ class _SettingsViewState extends State<SettingsView> {
                 SizedBox(width: 10),
                 Text(
                   "Logout",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.red), // Customize the color as needed
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.red),
                 ),
               ],
             ),
@@ -163,8 +167,7 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-
-  Future<bool> showLogOutDialog(BuildContext context){
+  Future<bool> showLogOutDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
       builder: (context) {
@@ -172,17 +175,21 @@ class _SettingsViewState extends State<SettingsView> {
           title: const Text('Log out'),
           content: const Text('Are You sure that You want to log out?'),
           actions: [
-            TextButton(onPressed: () {
-              Navigator.of(context).pop(false);
-            }, child: const Text('Cancel')),
-            TextButton(onPressed: () {
-              Navigator.of(context).pop(true);
-            }, child: const Text('Log out'))
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Log out'),
+            )
           ],
         );
       },
     ).then((value) => value ?? false);
   }
-
 }
-

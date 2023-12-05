@@ -5,13 +5,13 @@ import 'package:untitled/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:untitled/main.dart';
-import 'package:untitled/views/profile_view.dart';
+import 'package:untitled/views/change_password_view.dart';
 import 'package:untitled/views/goals_view.dart';
-import 'package:untitled/views/settings_view.dart';
+import 'package:untitled/views/profile_view.dart';
 
 import 'currencies_view.dart';
 import 'transactions_view.dart';
-import 'bottom_manu_view.dart';
+import 'bottom_menu_view.dart';
 
 class NotificationsView extends StatefulWidget {
   const NotificationsView({Key? key});

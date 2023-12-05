@@ -10,13 +10,13 @@ import 'package:untitled/views/currencies_view.dart';
 import 'package:untitled/views/transactions_view.dart';
 import 'package:untitled/views/help_view.dart';
 import 'package:untitled/views/login_view.dart';
-import 'package:untitled/views/bottom_manu_view.dart';
+import 'package:untitled/views/bottom_menu_view.dart';
 import 'package:untitled/views/notifications_view.dart';
 import 'package:untitled/views/privacy_and_security_view.dart';
-import 'package:untitled/views/profile_view.dart';
+import 'package:untitled/views/change_password_view.dart';
 import 'package:untitled/views/register_view.dart';
 import 'package:untitled/views/goals_view.dart';
-import 'package:untitled/views/settings_view.dart';
+import 'package:untitled/views/profile_view.dart';
 import 'package:untitled/views/verify_email_view.dart';
 import 'package:untitled/views/update_password_view.dart';
 
@@ -35,7 +35,7 @@ void main() {
       registerRoute: (context) => RegisterView(),
       verifyEmailRoute: (context) => VerifyEmailView(),
       mainRoute: (context) => MainView(),
-      profileRoute: (context) => ProfileView(),
+      profileRoute: (context) => ChangePasswordView(),
       transactionsRoute: (context) => Transactions(),
       currenciesRoute: (context) => CurrenciesView(),
       goalsRoute: (context) => GoalsView(),

@@ -58,7 +58,6 @@ class _HomeViewState extends State<HomeView> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Sekcja: Nagłówek
             Padding(
               padding: const EdgeInsets.only(bottom: 30.0),
               child: Text(
@@ -66,7 +65,6 @@ class _HomeViewState extends State<HomeView> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            // Sekcja: Wykres z legendą
             Expanded(
               child: FutureBuilder<QuerySnapshot>(
                 future: FirebaseFirestore.instance.collection('expenses').get(),
@@ -77,6 +75,17 @@ class _HomeViewState extends State<HomeView> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     expenseDataList = prepareExpenseData(snapshot.data);
+
+                    if (expenseDataList.isEmpty || getTotalAmount(expenseDataList) == 0) {
+                      return Center(
+                        child: Text(
+                          'Welcome to the app!\nCreate new outcome to see a chart.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      );
+                    }
+
                     return Column(
                       children: [
                         Expanded(
@@ -103,7 +112,6 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ),
                         ),
-                        // Sekcja: Legenda
                         Container(
                           height: 50,
                           child: ListView.builder(
@@ -133,48 +141,47 @@ class _HomeViewState extends State<HomeView> {
                             },
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ostatnie 2 wydatki:',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              DataTable(
+                                columns: [
+                                  DataColumn(label: Text('Kategoria')),
+                                  DataColumn(label: Text('Kwota')),
+                                ],
+                                rows: recentExpenses.map((expense) {
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Text(
+                                          expense.category,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(
+                                          expense.amount.toString(),
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     );
                   }
                 },
-              ),
-            ),
-            // Sekcja: Lista ostatnich 2 wydatków
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ostatnie 2 wydatki:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  DataTable(
-                    columns: [
-                      DataColumn(label: Text('Kategoria')),
-                      DataColumn(label: Text('Kwota')),
-                    ],
-                    rows: recentExpenses.map((expense) {
-                      return DataRow(
-                        cells: [
-                          DataCell(
-                            Text(
-                              expense.category,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              expense.amount.toString(),
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ],
               ),
             ),
           ],

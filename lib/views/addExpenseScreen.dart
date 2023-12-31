@@ -88,24 +88,33 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
               ),
               SizedBox(height: 10),
-              _buildTextField(
-                label: 'Amount',
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Amount is required';
-                  }
-                  try {
-                    double.parse(value);
-                  } catch (e) {
-                    return 'Invalid amount format';
-                  }
-                  return null;
-                },
-                prefixIcon: Icon(Icons.attach_money),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'Amount',
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Amount is required';
+                        }
+                        try {
+                          double.parse(value);
+                        } catch (e) {
+                          return 'Invalid amount format';
+                        }
+                        return null;
+                      },
+                      prefixIcon: Icon(Icons.attach_money),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCurrencyPickerTextField(),
+                  ),
+                ],
               ),
-              _buildCurrencyPickerTextField(),
               SizedBox(height: 10),
               _buildDropdownButtonFormField(
                 value: selectedPaymentMethod,

@@ -1,4 +1,3 @@
-// AddIncomeScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,9 +41,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
+              _buildTextField(
+                label: 'Name',
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Name is required';
@@ -71,70 +70,51 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   }
                 },
                 child: AbsorbPointer(
-                  child: TextFormField(
+                  child: _buildTextField(
+                    label: 'Date',
                     controller: _dateController,
-                    decoration: InputDecoration(labelText: 'Date'),
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Date is required';
                       }
                       return null;
                     },
+                    suffixIcon: Icon(Icons.calendar_today),
                   ),
                 ),
               ),
               SizedBox(height: 10),
-              TextFormField(
-                controller: _amountController,
-                decoration: InputDecoration(labelText: 'Amount'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Amount is required';
-                  }
-                  try {
-                    double.parse(value);
-                  } catch (e) {
-                    return 'Invalid amount format';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _currencyTextField,
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: _selectedCurrency != null
-                      ? _selectedCurrency!.name
-                      : 'Currency',
-                  prefixIcon: Icon(
-                    Icons.attach_money,
-                    color: Colors.grey,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.grey,
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'Amount',
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Amount is required';
+                        }
+                        try {
+                          double.parse(value);
+                        } catch (e) {
+                          return 'Invalid amount format';
+                        }
+                        return null;
+                      },
+                      prefixIcon: Icon(Icons.attach_money),
                     ),
-                    onPressed: () {
-                      _openCurrencyPicker(); // Wywołanie funkcji otwierającej CurrencyPicker
-                    },
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCurrencyPickerTextField(),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                ),
-                style: TextStyle(color: Colors.black),
+                ],
               ),
               SizedBox(height: 10),
-              TextFormField(
+              _buildTextField(
+                label: 'Description',
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -149,6 +129,67 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    Widget? prefixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+      ),
+      style: TextStyle(color: Colors.black),
+      keyboardType: keyboardType,
+      validator: validator,
+    );
+  }
+
+  Widget _buildCurrencyPickerTextField() {
+    return TextFormField(
+      controller: _currencyTextField,
+      readOnly: true,
+      decoration: InputDecoration(
+        hintText: _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
+        prefixIcon: Icon(
+          Icons.attach_money,
+          color: Colors.grey,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            Icons.arrow_drop_down,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            _openCurrencyPicker();
+          },
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+      ),
+      style: TextStyle(color: Colors.black),
     );
   }
 
@@ -188,6 +229,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       onSelect: (Currency currency) {
         setState(() {
           _selectedCurrency = currency;
+          _currencyTextField.text = currency.name;
         });
       },
     );

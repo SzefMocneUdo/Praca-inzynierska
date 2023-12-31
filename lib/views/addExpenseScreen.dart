@@ -1,9 +1,8 @@
 // AddExpenseScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../model/Currency.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({Key? key}) : super(key: key);
@@ -17,7 +16,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   DateTime? _selectedDate;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
-  Currency? selectedCurrency;
+  Currency? _selectedCurrency;
+  late TextEditingController _currencyTextField;
   TextEditingController _categoryController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   String? selectedPaymentMethod;
@@ -25,12 +25,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  List<Currency> currencies = [
-    Currency(code: 'USD', name: 'US Dollar'),
-    Currency(code: 'EUR', name: 'Euro'),
-    Currency(code: 'GBP', name: 'British Pound'),
-    // Dodaj inne waluty według potrzeb
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currencyTextField = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +69,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     setState(() {
                       _selectedDate = pickedDate;
                       _dateController.text =
-                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },
@@ -104,26 +103,36 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   return null;
                 },
               ),
-              DropdownButtonFormField<Currency>(
-                value: selectedCurrency,
-                onChanged: (Currency? newValue) {
-                  setState(() {
-                    selectedCurrency = newValue;
-                  });
-                },
-                items: currencies.map<DropdownMenuItem<Currency>>((Currency currency) {
-                  return DropdownMenuItem<Currency>(
-                    value: currency,
-                    child: Text(currency.name),
-                  );
-                }).toList(),
-                decoration: InputDecoration(labelText: 'Currency'),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Currency is required';
-                  }
-                  return null;
-                },
+              TextFormField(
+                controller: _currencyTextField,
+                readOnly: true,
+                decoration: InputDecoration(
+                  hintText: _selectedCurrency != null
+                      ? _selectedCurrency!.name
+                      : 'Currency',
+                  prefixIcon: Icon(
+                    Icons.attach_money,
+                    color: Colors.grey,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      _openCurrencyPicker(); // Wywołanie funkcji otwierającej CurrencyPicker
+                    },
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                    borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                ),
+                style: TextStyle(color: Colors.black),
               ),
               SizedBox(height: 10),
               DropdownButtonFormField<String>(
@@ -133,7 +142,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     selectedPaymentMethod = newValue;
                   });
                 },
-                items: paymentMethods.map<DropdownMenuItem<String>>((String method) {
+                items: paymentMethods
+                    .map<DropdownMenuItem<String>>((String method) {
                   return DropdownMenuItem<String>(
                     value: method,
                     child: Text(method),
@@ -196,7 +206,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           'amount': double.parse(_amountController.text),
           'category': _categoryController.text,
           'description': _descriptionController.text,
-          'currency': selectedCurrency?.code,
+          'currency': _selectedCurrency?.code,
           'paymentMethod': selectedPaymentMethod,
         });
 
@@ -209,5 +219,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
 
     Navigator.pop(context);
+  }
+
+  void _openCurrencyPicker() {
+    showCurrencyPicker(
+      context: context,
+      showFlag: true,
+      showCurrencyName: true,
+      showCurrencyCode: true,
+      onSelect: (Currency currency) {
+        setState(() {
+          _selectedCurrency = currency;
+        });
+      },
+    );
   }
 }

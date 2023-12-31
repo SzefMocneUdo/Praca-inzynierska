@@ -1,4 +1,3 @@
-// Klasa dla dialogu wyświetlającego szczegóły obiektu finansowego
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +29,7 @@ class FinancialItemDetailsDialog {
                 ),
                 SizedBox(height: 10),
                 Text('Name: ${financialItem.name}'),
-                Text('Date: ${financialItem.date}'),
+                Text('Date: ${_formattedDate(financialItem.date)}'),
                 Text('Amount: ${financialItem.amount} ${financialItem.currency}'),
                 if (financialItem is Expense)
                   ...[
@@ -53,5 +52,9 @@ class FinancialItemDetailsDialog {
         );
       },
     );
+  }
+
+  String _formattedDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
   }
 }

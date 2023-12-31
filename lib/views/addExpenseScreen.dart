@@ -1,3 +1,4 @@
+// AddExpenseScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,33 +88,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
               ),
               SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextField(
-                      label: 'Amount',
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Amount is required';
-                        }
-                        try {
-                          double.parse(value);
-                        } catch (e) {
-                          return 'Invalid amount format';
-                        }
-                        return null;
-                      },
-                      prefixIcon: Icon(Icons.attach_money),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: _buildCurrencyPickerTextField(),
-                  ),
-                ],
+              _buildTextField(
+                label: 'Amount',
+                controller: _amountController,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Amount is required';
+                  }
+                  try {
+                    double.parse(value);
+                  } catch (e) {
+                    return 'Invalid amount format';
+                  }
+                  return null;
+                },
+                prefixIcon: Icon(Icons.attach_money),
               ),
+              _buildCurrencyPickerTextField(),
               SizedBox(height: 10),
               _buildDropdownButtonFormField(
                 value: selectedPaymentMethod,

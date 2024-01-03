@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled/views/currencies_view.dart';
@@ -19,7 +21,54 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   List<String> currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "PLN"];
   String _fromController = "USD";
   String _toController = "EUR";
-  List<CurrencyRate> savedCurrencies = [];
+
+  Future<bool> checkIfObjectExists(
+      FirebaseFirestore firestore, String fromValue, String toValue) async {
+    try {
+      QuerySnapshot querySnapshot = await firestore
+          .collection('followedCurrencies')
+          .where('from', isEqualTo: fromValue)
+          .where('to', isEqualTo: toValue)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print('Wystąpił błąd: $e');
+      throw e;
+    }
+  }
+
+
+  // Metoda do zapisywania przeliczników do kolekcji followedCurrencies
+  void _addCurrencies() async{
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+        bool exists = await checkIfObjectExists(firestore, _fromController, _toController);
+
+        if(exists){
+          print("Object already exists");
+        }
+        else{
+          firestore.collection('followedCurrencies').add({
+            'from': _fromController,
+            'to': _toController,
+          });
+
+          print('Currency rate added successfully!');
+        }
+      } else {
+        print('User not logged in.');
+      }
+    } catch (e) {
+      print('Error adding currency rate: $e');
+    }
+
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +131,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _fromController,
                   onChanged: (String? newValue) {
@@ -91,7 +140,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                     });
                   },
                   items:
-                      currencies.map<DropdownMenuItem<String>>((String value) {
+                  currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -131,7 +180,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _toController,
                   onChanged: (String? newValue) {
@@ -140,7 +189,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                     });
                   },
                   items:
-                      currencies.map<DropdownMenuItem<String>>((String value) {
+                  currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -151,14 +200,11 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('fromCurrency', _fromController);
-                  await prefs.setString('toCurrency', _toController);
+                  // SharedPreferences prefs = await SharedPreferences.getInstance();
+                  // await prefs.setString('fromCurrency', _fromController);
+                  // await prefs.setString('toCurrency', _toController);
 
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (BuildContext context) => CurrenciesView()),
-                  );
+                  _addCurrencies(); // Zamknięcie bieżącego ekranu
                 },
                 child: Text(
                   'Save',

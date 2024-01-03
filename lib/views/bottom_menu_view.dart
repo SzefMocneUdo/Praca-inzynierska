@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/views/settings_view.dart';
+import 'package:untitled/views/profile_view.dart';
 
+import 'addCreditCardScreen.dart';
 import 'addExpenseScreen.dart';
 import 'addFinancialGoalScreen.dart';
 import 'addIncomeScreen.dart';
@@ -112,9 +113,14 @@ class _MainViewState extends State<MainView> {
               ListTile(
                 leading: Icon(Icons.credit_card),
                 title: Text('Attach new credit card'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  // Add your navigation logic
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddCreditCardScreen(),
+                    ),
+                  );
                 },
               ),
               ListTile(
@@ -156,7 +162,7 @@ class CustomBottomAppBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTabChange;
   final Color color;
-  final List<String> tabLabels = ['Currency', 'Transactions', 'Home','Goals', 'Setting'];
+  final List<String> tabLabels = ['Currency', 'Transactions', 'Home','Goals', 'Profile'];
 
   CustomBottomAppBar({
     required this.selectedIndex,
@@ -177,7 +183,7 @@ class CustomBottomAppBar extends StatelessWidget {
           _buildTabIconButton(Icons.cached, 0),
           _buildTabIconButton(Icons.attach_money, 1),
           _buildTabIconButton(Icons.flag, 3),
-          _buildTabIconButton(Icons.settings, 4),
+          _buildTabIconButton(Icons.account_circle_sharp, 4),
         ],
       ),
     );

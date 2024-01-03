@@ -37,7 +37,14 @@ dependencies:
   fl_chart: ^0.40.0
   cloud_firestore: ^4.13.0
   crypto: ^3.0.1
+
+  url_launcher: ^6.2.1
+  credit_card_validator: ^2.1.0
+  awesome_card: ^1.1.7
   currency_picker: ^2.0.19
+  flutter_svg: ^2.0.9
+  flip_card: ^0.7.0
+#  awesome_card: ^1.1.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,7 +76,9 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/ic_logo.png
+    - lib/assets/icons/
+    - lib/assets/
+    - lib/assets/card_provider/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

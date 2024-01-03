@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
 import 'package:untitled/views/currencies_view.dart';
-import 'package:currency_picker/currency_picker.dart';
 
 class CurrencyConvrterScreen extends StatefulWidget {
   const CurrencyConvrterScreen({Key? key}) : super(key: key);
@@ -66,17 +65,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(width: 1, color: Colors.black)),
                 width: 300,
-                child:
-                // showCurrencyPicker(
-                //   context: context,
-                //   showFlag: true,
-                //   showCurrencyName: true,
-                //   showCurrencyCode: true,
-                //   onSelect: (Currency currency) {
-                //     print('Select currency: ${currency.name}');
-                //   },
-                // )
-                DropdownButtonFormField<String>(
+                child: DropdownButtonFormField<String>(
                   dropdownColor: Colors.white54,
                   icon: Icon(Icons.arrow_drop_down),
                   iconEnabledColor: Colors.black,

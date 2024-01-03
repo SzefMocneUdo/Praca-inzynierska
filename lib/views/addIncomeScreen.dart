@@ -1,9 +1,7 @@
-// AddIncomeScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../model/Currency.dart';
 
 class AddIncomeScreen extends StatefulWidget {
   const AddIncomeScreen({Key? key}) : super(key: key);
@@ -17,24 +15,24 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   DateTime? _selectedDate;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
-  Currency? selectedCurrency;
+  Currency? _selectedCurrency;
+  late TextEditingController _currencyTextField;
   TextEditingController _descriptionController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
-  List<Currency> currencies = [
-    Currency(code: 'USD', name: 'US Dollar'),
-    Currency(code: 'EUR', name: 'Euro'),
-    Currency(code: 'GBP', name: 'British Pound'),
-    // Dodaj inne waluty według potrzeb
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currencyTextField = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add New Income'),
-        backgroundColor: Colors.blueAccent, // Zmiana koloru dla przychodów
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -43,9 +41,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
+              _buildTextField(
+                label: 'Name',
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Name is required';
@@ -67,65 +65,56 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     setState(() {
                       _selectedDate = pickedDate;
                       _dateController.text =
-                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },
                 child: AbsorbPointer(
-                  child: TextFormField(
+                  child: _buildTextField(
+                    label: 'Date',
                     controller: _dateController,
-                    decoration: InputDecoration(labelText: 'Date'),
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Date is required';
                       }
                       return null;
                     },
+                    suffixIcon: Icon(Icons.calendar_today),
                   ),
                 ),
               ),
               SizedBox(height: 10),
-              TextFormField(
-                controller: _amountController,
-                decoration: InputDecoration(labelText: 'Amount'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Amount is required';
-                  }
-                  try {
-                    double.parse(value);
-                  } catch (e) {
-                    return 'Invalid amount format';
-                  }
-                  return null;
-                },
-              ),
-              DropdownButtonFormField<Currency>(
-                value: selectedCurrency,
-                onChanged: (Currency? newValue) {
-                  setState(() {
-                    selectedCurrency = newValue;
-                  });
-                },
-                items: currencies.map<DropdownMenuItem<Currency>>((Currency currency) {
-                  return DropdownMenuItem<Currency>(
-                    value: currency,
-                    child: Text(currency.name),
-                  );
-                }).toList(),
-                decoration: InputDecoration(labelText: 'Currency'),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Currency is required';
-                  }
-                  return null;
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'Amount',
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Amount is required';
+                        }
+                        try {
+                          double.parse(value);
+                        } catch (e) {
+                          return 'Invalid amount format';
+                        }
+                        return null;
+                      },
+                      prefixIcon: Icon(Icons.attach_money),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _buildCurrencyPickerTextField(),
+                  ),
+                ],
               ),
               SizedBox(height: 10),
-              TextFormField(
+              _buildTextField(
+                label: 'Description',
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -143,6 +132,67 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     );
   }
 
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    Widget? prefixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+      ),
+      style: TextStyle(color: Colors.black),
+      keyboardType: keyboardType,
+      validator: validator,
+    );
+  }
+
+  Widget _buildCurrencyPickerTextField() {
+    return TextFormField(
+      controller: _currencyTextField,
+      readOnly: true,
+      decoration: InputDecoration(
+        hintText: _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
+        prefixIcon: Icon(
+          Icons.attach_money,
+          color: Colors.grey,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            Icons.arrow_drop_down,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            _openCurrencyPicker();
+          },
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+      ),
+      style: TextStyle(color: Colors.black),
+    );
+  }
+
   void _addIncome() {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -156,7 +206,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           'date': _selectedDate,
           'amount': double.parse(_amountController.text),
           'description': _descriptionController.text,
-          'currency': selectedCurrency?.code,
+          'currency': _selectedCurrency?.code,
         });
 
         print('Income added successfully!');
@@ -168,5 +218,20 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     }
 
     Navigator.pop(context);
+  }
+
+  void _openCurrencyPicker() {
+    showCurrencyPicker(
+      context: context,
+      showFlag: true,
+      showCurrencyName: true,
+      showCurrencyCode: true,
+      onSelect: (Currency currency) {
+        setState(() {
+          _selectedCurrency = currency;
+          _currencyTextField.text = currency.name;
+        });
+      },
+    );
   }
 }

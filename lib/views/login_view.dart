@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:untitled/constants/routes.dart';
 
@@ -14,6 +13,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool _obscurePassword = true;
   Color emailBorderColor = Colors.grey;
   Color passwordBorderColor = Colors.grey;
   Color emailIconColor = Colors.grey;
@@ -63,7 +63,6 @@ class _LoginViewState extends State<LoginView> {
     required Function(String) validator,
     required Color borderColor,
     required Color iconColor,
-    Widget? prefixWidget,
   }) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -72,10 +71,23 @@ class _LoginViewState extends State<LoginView> {
         enableSuggestions: false,
         keyboardType: isPassword ? TextInputType.visiblePassword : TextInputType.emailAddress,
         autocorrect: false,
-        obscureText: isPassword,
+        obscureText: isPassword && _obscurePassword,
         decoration: InputDecoration(
           hintText: hintText,
-          prefixIcon: prefixWidget != null ? Padding(padding: const EdgeInsets.all(8.0), child: prefixWidget) : Icon(iconData, color: iconColor),
+          prefixIcon: Icon(iconData, color: iconColor),
+          suffixIcon: isPassword
+              ? IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+          )
+              : null,
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25.0),
             borderSide: BorderSide(color: borderColor, width: 2.0),
@@ -106,101 +118,119 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  void _showEmailSentDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Verification Email Sent'),
+          content:
+          Text('A verification email has been sent. Check your inbox.'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login'), backgroundColor: Colors.white),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: AssetImage('lib/assets/ic_logo.png'),
-                  fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  image: const DecorationImage(
+                    image: AssetImage('lib/assets/ic_logo.png'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(0.0),
+                  border: Border.all(color: Colors.white, width: 2.0),
                 ),
-                borderRadius: BorderRadius.circular(0.0),
-                border: Border.all(color: Colors.white, width: 2.0),
               ),
-            ),
-            SizedBox(height: 20.0),
-            _buildTextField(
-              controller: _email,
-              hintText: 'E-mail',
-              isPassword: false,
-              iconData: Icons.email,
-              validator: (value) {
-                return null; // Add your validation logic here
-              },
-              borderColor: emailBorderColor,
-              iconColor: emailIconColor,
-            ),
-            SizedBox(height: 10.0),
-            _buildTextField(
-              controller: _password,
-              hintText: 'Password',
-              isPassword: true,
-              iconData: Icons.lock,
-              validator: (value) {
-                return null; // Add your validation logic here
-              },
-              borderColor: passwordBorderColor,
-              iconColor: passwordIconColor,
-            ),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: () async {
-                final email = _email.text;
-                final password = _password.text;
-                try {
-                  final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-                  if (userCredential.user?.emailVerified ?? false) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Account not verified'),
-                          content: Text('Please verify your email before logging in.'),
-                          actions: [
-                            Center(
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Send verification email'),
+              SizedBox(height: 20.0),
+              _buildTextField(
+                controller: _email,
+                hintText: 'E-mail',
+                isPassword: false,
+                iconData: Icons.email,
+                validator: (value) {
+                  return null; // Add your validation logic here
+                },
+                borderColor: emailBorderColor,
+                iconColor: emailIconColor,
+              ),
+              SizedBox(height: 10.0),
+              _buildTextField(
+                controller: _password,
+                hintText: 'Password',
+                isPassword: true,
+                iconData: Icons.lock,
+                validator: (value) {
+                  return null; // Add your validation logic here
+                },
+                borderColor: passwordBorderColor,
+                iconColor: passwordIconColor,
+              ),
+              SizedBox(height: 10.0),
+              ElevatedButton(
+                onPressed: () async {
+                  final email = _email.text;
+                  final password = _password.text;
+                  try {
+                    final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+                    if (userCredential.user?.emailVerified ?? false) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Account not verified'),
+                            content: Text('Please verify your email before logging in.'),
+                            actions: [
+                              Center(
+                                child: TextButton(
+                                  onPressed: () async {
+                                    await userCredential.user?.sendEmailVerification();
+                                    // Navigator.of(context).pop();
+                                    _showEmailSentDialog();
+                                  },
+                                  child: Text('Send verification email'),
+                                ),
                               ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    _showErrorDialog('Incorrect login credentials');
                   }
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-                    setState(() {
-                      loginErrorMessage = 'Incorrect login credentials';
-                    });
-                    Future.delayed(Duration.zero, () {
-                      _showErrorDialog(loginErrorMessage!);
-                    });
-                  }
-                }
-              },
-              child: const Text('LogIn'),
-            ),
-            SizedBox(height: 10.0),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(registerRoute, (route) => false);
-              },
-              child: const Text('Not registered yet? Register here!'),
-            ),
-          ],
+                },
+                child: const Text('LogIn'),
+              ),
+              SizedBox(height: 10.0),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamedAndRemoveUntil(registerRoute, (route) => false);
+                },
+                child: const Text('Not registered yet? Register here!'),
+              ),
+            ],
+          ),
         ),
       ),
     );

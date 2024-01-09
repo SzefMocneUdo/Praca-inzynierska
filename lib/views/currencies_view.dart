@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled/views/followExchangeRatesScreen.dart';
+import 'package:live_currency_rate/live_currency_rate.dart';
+import '../model/Currency.dart';
 import 'currencyConverterScreen.dart';
 import 'notifications_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:live_currency_rate/live_currency_rate.dart';
+import 'followExchangeRatesScreen.dart';
 
 class CurrenciesView extends StatefulWidget {
   const CurrenciesView({Key? key});
@@ -14,70 +15,112 @@ class CurrenciesView extends StatefulWidget {
 }
 
 class _CurrenciesViewState extends State<CurrenciesView> {
-  String _fromController = '';
-  String _toController = '';
-  String _rateController = '';
-
   List<String> savedConversions = [];
+  late User? user;
+  bool hasConversions = false;
 
-  Future<void> loadSavedCurrencies() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String fromCurrency = prefs.getString('fromCurrency') ?? '';
-    String toCurrency = prefs.getString('toCurrency') ?? '';
-
-    CurrencyRate rate =
-    await LiveCurrencyRate.convertCurrency(fromCurrency, toCurrency, 1);
-
-    setState(() {
-      _fromController = fromCurrency;
-      _toController = toCurrency;
-      _rateController = rate.result.toString();
-    });
-
-    // Pobranie listy zapisanych przeliczników
-    List<String>? savedList = prefs.getStringList('savedConversions');
-    if (savedList != null) {
-      setState(() {
-        savedConversions = savedList;
-      });
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    if(user!=null){
+      loadSavedCurrencies(user!);
     }
   }
 
-  Future<List<String>> _calculateRates(List<QueryDocumentSnapshot> documents) async {
+  Future<List<Currency>?> loadSavedCurrencies(User user) async {
+    try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('followedCurrencies')
+            .where('userId', isEqualTo: user.uid)
+            .get();
+
+        if (querySnapshot.docs.isEmpty) {
+          setState(() {
+            savedConversions = [];
+            hasConversions = false;
+          });
+        } else {
+          setState(() {
+            savedConversions = prepareCurrencyData(querySnapshot);
+            hasConversions = true;
+          });
+        }
+    } catch (e) {
+      print('Error fetching saved currencies: $e');
+    }
+  }
+
+  List<String> prepareCurrencyData(QuerySnapshot snapshot) {
+    List<String> currencyDataList = [];
+
+    snapshot.docs.forEach((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      String from = data['from'] ?? 'Unknown';
+      String to = data['to'] ?? 'Unknown';
+      String userId = data['userId'] ?? 'Unknown';
+
+      int existingIndex = currencyDataList.indexOf('$from - $to');
+
+      if (existingIndex != -1) {
+        currencyDataList[existingIndex] += ', $to';
+      } else {
+        currencyDataList.add('$from - $to');
+      }
+    });
+
+    return currencyDataList;
+  }
+
+  Future<List<String>> _calculateRates(QuerySnapshot snapshot) async {
+    List<String> currencyDataList = prepareCurrencyData(snapshot);
     List<String> rates = [];
 
-    for (var doc in documents) {
-      String from = doc['from'];
-      String to = doc['to'];
+    String userId = user?.uid ?? '';
 
-      CurrencyRate rate = await LiveCurrencyRate.convertCurrency(from, to, 1);
-      rates.add(rate.result.toString());
+    for (var currency in currencyDataList) {
+      List<String> currencies = currency.split(' - ');
+      String from = currencies[0];
+      String to = currencies[1];
+
+      for (var doc in snapshot.docs) {
+        String docUserId = doc['userId'];
+        String docFrom = doc['from'];
+        String docTo = doc['to'];
+
+        if (docUserId == userId && docFrom == from && docTo == to) {
+          CurrencyRate rate = await LiveCurrencyRate.convertCurrency(docFrom, docTo, 1);
+          rates.add(rate.result.toString());
+          break;
+        }
+      }
     }
 
     return rates;
   }
 
-  void _deleteCurrencyRate(String from, String to) {
-    FirebaseFirestore.instance
-        .collection('currencyRates')
-        .where('from', isEqualTo: from)
-        .where('to', isEqualTo: to)
-        .get()
-        .then((snapshot) {
-      snapshot.docs.forEach((doc) {
-        doc.reference.delete();
+
+  Future<void> _deleteCurrencyRate(String from, String to, String userId) async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('followedCurrencies')
+          .where('from', isEqualTo: from)
+          .where('to', isEqualTo: to)
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      List<DocumentSnapshot> documents = snapshot.docs;
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        for (final doc in documents) {
+          transaction.delete(doc.reference);
+        }
       });
-    })
-        .catchError((error) {
+
+      print('Currency rate deleted successfully!');
+    } catch (error) {
       print('Error deleting currency rate: $error');
-    });
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-    loadSavedCurrencies();
+    }
   }
 
   @override
@@ -163,7 +206,7 @@ class _CurrenciesViewState extends State<CurrenciesView> {
                 Expanded(
                     child:
                     StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('followedCurrencies').snapshots(),
+                        stream: FirebaseFirestore.instance.collection('followedCurrencies').where('userId', isEqualTo: user!.uid).snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(
@@ -183,7 +226,7 @@ class _CurrenciesViewState extends State<CurrenciesView> {
 
                           // Oblicz stawki walut na podstawie dokumentów z Firestore
                           return FutureBuilder<List<String>>(
-                            future: _calculateRates(snapshot.data!.docs),
+                            future: _calculateRates(snapshot.data!),
                             builder: (BuildContext context, AsyncSnapshot<List<String>> ratesSnapshot) {
                               if (ratesSnapshot.connectionState == ConnectionState.waiting) {
                                 return Center(
@@ -205,11 +248,15 @@ class _CurrenciesViewState extends State<CurrenciesView> {
 
 
                               return ListView.builder(
-                                itemCount: snapshot.data!.docs.length,
+                                itemCount: rates.length,
                                 itemBuilder: (context, index) {
                                   var currency = snapshot.data!.docs[index];
                                   String from = currency['from'];
                                   String to = currency['to'];
+                                  String userId = "";
+                                  if(user!=null){
+                                    userId = user!.uid;
+                                  }
                                   double rate = double.tryParse(rates[index]) ?? 0.0;
 
                                   return Dismissible(
@@ -225,7 +272,7 @@ class _CurrenciesViewState extends State<CurrenciesView> {
                                       ),
                                     ),
                                     confirmDismiss: (direction) async {
-                                      if (direction == DismissDirection.endToStart) {
+                                      if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
                                         // Confirm deletion
                                         bool confirmDelete = await showDialog(
                                           context: context,
@@ -255,13 +302,12 @@ class _CurrenciesViewState extends State<CurrenciesView> {
                                       return false;
                                     },
                                     onDismissed: (direction) {
-                                      if (direction == DismissDirection.endToStart) {
-                                        // Delete from database
-                                        _deleteCurrencyRate(from, to); // Implementacja usuwania przelicznika
+                                      if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
+                                        _deleteCurrencyRate(from, to, userId); // Implementacja usuwania przelicznika
                                       }
                                     },
                                     child: ListTile(
-                                      title: Text('From: $from, To: $to, Rate: $rate'),
+                                      title: Text('From: $from To: $to: $rate'),
                                     ),
                                   );
                                 },

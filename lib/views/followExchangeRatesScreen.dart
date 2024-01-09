@@ -25,13 +25,22 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   Future<bool> checkIfObjectExists(
       FirebaseFirestore firestore, String fromValue, String toValue) async {
     try {
-      QuerySnapshot querySnapshot = await firestore
-          .collection('followedCurrencies')
-          .where('from', isEqualTo: fromValue)
-          .where('to', isEqualTo: toValue)
-          .get();
+      User? user = FirebaseAuth.instance.currentUser;
+      if(user != null){
+        QuerySnapshot querySnapshot = await firestore
+            .collection('followedCurrencies')
+            .where('from', isEqualTo: fromValue)
+            .where('to', isEqualTo: toValue)
+            .where('userId', isEqualTo: user.uid)
+            .get();
 
-      return querySnapshot.docs.isNotEmpty;
+        return querySnapshot.docs.isNotEmpty;
+      }
+      else{
+        print("User does not exist");
+        return false;
+      }
+
     } catch (e) {
       print('Wystąpił błąd: $e');
       throw e;
@@ -56,6 +65,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
           firestore.collection('followedCurrencies').add({
             'from': _fromController,
             'to': _toController,
+            "userId": user.uid
           });
 
           print('Currency rate added successfully!');

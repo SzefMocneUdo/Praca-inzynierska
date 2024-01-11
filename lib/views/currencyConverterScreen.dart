@@ -12,12 +12,106 @@ class CurrencyConvrterScreen extends StatefulWidget {
 }
 
 class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
-  List<String> currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "PLN"];
-  String _fromController = "USD";
-  String _toController = "EUR";
   TextEditingController _amountController = TextEditingController();
   double _exchangeRateController = 0.0;
   double _resultController = 0.0;
+  Currency? _fromController;
+  Currency? _toController;
+  late TextEditingController _fromCurrencyTextField;
+  late TextEditingController _toCurrencyTextField;
+
+  @override
+  void initState() {
+    super.initState();
+    _fromCurrencyTextField = TextEditingController();
+    _toCurrencyTextField = TextEditingController();
+  }
+
+  void _openCurrencyPicker(bool isFrom) {
+    showCurrencyPicker(
+      context: context,
+      showFlag: true,
+      showCurrencyName: true,
+      showCurrencyCode: true,
+      onSelect: (Currency currency) {
+        setState(() {
+          if(isFrom){
+            _fromController = currency;
+            _fromCurrencyTextField.text = currency.name;
+          }
+          else{
+            _toController = currency;
+            _toCurrencyTextField.text = currency.name;
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildCurrencyPickerTextField(bool isFrom) {
+    if(isFrom){
+      return TextFormField(
+        controller: _fromCurrencyTextField,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: _fromController != null ? _fromController!.name : 'Currency',
+          prefixIcon: Icon(
+            Icons.attach_money,
+            color: Colors.grey,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              _openCurrencyPicker(isFrom);
+            },
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+        ),
+        style: TextStyle(color: Colors.black),
+      );
+    }
+    else{
+      return TextFormField(
+        controller: _toCurrencyTextField,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: _toController != null ? _toController!.name : 'Currency',
+          prefixIcon: Icon(
+            Icons.attach_money,
+            color: Colors.grey,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              _openCurrencyPicker(isFrom);
+            },
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+        ),
+        style: TextStyle(color: Colors.black),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,51 +155,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
               ),
               SizedBox(height: 5),
               Container(
-                decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(width: 1, color: Colors.black)),
-                width: 300,
-                child:
-                // showCurrencyPicker(
-                //   context: context,
-                //   showFlag: true,
-                //   showCurrencyName: true,
-                //   showCurrencyCode: true,
-                //   onSelect: (Currency currency) {
-                //     print('Select currency: ${currency.name}');
-                //   },
-                // )
-                DropdownButtonFormField<String>(
-                  dropdownColor: Colors.white54,
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconEnabledColor: Colors.black,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  value: _fromController,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _fromController = newValue!;
-                    });
-                  },
-                  items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
+                child: _buildCurrencyPickerTextField(true),
               ),
               SizedBox(height: 30),
               Padding(
@@ -119,43 +169,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(width: 1, color: Colors.black)),
-                width: 300,
-                child: DropdownButtonFormField<String>(
-                  dropdownColor: Colors.white54,
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconEnabledColor: Colors.black,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  value: _toController,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _toController = newValue!;
-                    });
-                  },
-                  items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
+              Container(child: _buildCurrencyPickerTextField(false)),
               SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.only(left: 20, top: 8),
@@ -186,9 +200,16 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 onPressed: () async {
                   String amountText = _amountController.text;
                   double amount = double.tryParse(amountText) ?? 0.0;
-                  CurrencyRate rate = await LiveCurrencyRate.convertCurrency(
-                      _fromController, _toController, amount);
+
+                  if (_fromController == null || _toController == null) {
+                    return;
+                  }
+                  String fromCode = _fromController!.code ?? "";
+                  String toCode = _toController!.code ?? "";
+
+                  CurrencyRate rate = await LiveCurrencyRate.convertCurrency(fromCode, toCode, amount);
                   _exchangeRateController = rate.result / amount;
+
                   setState(() {
                     _resultController = rate.result;
                   });

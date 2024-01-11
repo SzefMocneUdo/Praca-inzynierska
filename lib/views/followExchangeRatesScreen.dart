@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled/views/currencies_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/CurrencyRate.dart';
 
 
 
@@ -19,8 +18,103 @@ class FollowExchangeRatesScreen extends StatefulWidget {
 
 class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   List<String> currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "PLN"];
-  String _fromController = "USD";
-  String _toController = "EUR";
+  Currency? _fromController;
+  Currency? _toController;
+  late TextEditingController _fromCurrencyTextField;
+  late TextEditingController _toCurrencyTextField;
+
+  @override
+  void initState() {
+    super.initState();
+    _fromCurrencyTextField = TextEditingController();
+    _toCurrencyTextField = TextEditingController();
+  }
+
+  void _openCurrencyPicker(bool isFrom) {
+    showCurrencyPicker(
+      context: context,
+      showFlag: true,
+      showCurrencyName: true,
+      showCurrencyCode: true,
+      onSelect: (Currency currency) {
+        setState(() {
+          if(isFrom){
+            _fromController = currency;
+            _fromCurrencyTextField.text = currency.name;
+          }
+          else{
+            _toController = currency;
+            _toCurrencyTextField.text = currency.name;
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildCurrencyPickerTextField(bool isFrom) {
+    if(isFrom){
+      return TextFormField(
+        controller: _fromCurrencyTextField,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: _fromController != null ? _fromController!.name : 'Currency',
+          prefixIcon: Icon(
+            Icons.attach_money,
+            color: Colors.grey,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              _openCurrencyPicker(isFrom);
+            },
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+        ),
+        style: TextStyle(color: Colors.black),
+      );
+    }
+    else{
+      return TextFormField(
+        controller: _toCurrencyTextField,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: _toController != null ? _toController!.name : 'Currency',
+          prefixIcon: Icon(
+            Icons.attach_money,
+            color: Colors.grey,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              _openCurrencyPicker(isFrom);
+            },
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0),
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+        ),
+        style: TextStyle(color: Colors.black),
+      );
+    }
+  }
 
   Future<bool> checkIfObjectExists(
       FirebaseFirestore firestore, String fromValue, String toValue) async {
@@ -56,15 +150,20 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
       if (user != null) {
         FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-        bool exists = await checkIfObjectExists(firestore, _fromController, _toController);
+        bool exists = await checkIfObjectExists(
+          firestore,
+          _fromController?.code ?? '',
+          _toController?.code ?? '',
+        );
+
 
         if(exists){
           print("Object already exists");
         }
         else{
           firestore.collection('followedCurrencies').add({
-            'from': _fromController,
-            'to': _toController,
+            'from': _fromController?.code ?? '',
+            'to': _toController?.code ?? '',
             "userId": user.uid
           });
 
@@ -122,41 +221,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
               ),
               SizedBox(height: 5),
               Container(
-                decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(width: 1, color: Colors.black)),
-                width: 300,
-                child: DropdownButtonFormField<String>(
-                  dropdownColor: Colors.white54,
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconEnabledColor: Colors.black,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  value: _fromController,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _fromController = newValue!;
-                    });
-                  },
-                  items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
+                child: _buildCurrencyPickerTextField(true),
               ),
               SizedBox(height: 30),
               Padding(
@@ -171,41 +236,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
               ),
               SizedBox(height: 5),
               Container(
-                decoration: BoxDecoration(
-                    color: Colors.white54,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(width: 1, color: Colors.black)),
-                width: 300,
-                child: DropdownButtonFormField<String>(
-                  dropdownColor: Colors.white54,
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconEnabledColor: Colors.black,
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  ),
-                  value: _toController,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _toController = newValue!;
-                    });
-                  },
-                  items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
+                child: _buildCurrencyPickerTextField(false),
               ),
               SizedBox(height: 30),
               ElevatedButton(

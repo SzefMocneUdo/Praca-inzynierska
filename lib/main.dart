@@ -1,24 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:untitled/views/AddCreditCardScreen.dart';
+import 'package:untitled/views/BottomMenuView.dart';
 import 'package:untitled/views/CardListView.dart';
-import 'package:untitled/views/addCreditCardScreen.dart';
-import 'package:untitled/views/currencies_view.dart';
-import 'package:untitled/views/transactions_view.dart';
-import 'package:untitled/views/help_view.dart';
-import 'package:untitled/views/login_view.dart';
-import 'package:untitled/views/bottom_menu_view.dart';
-import 'package:untitled/views/notifications_view.dart';
-import 'package:untitled/views/privacy_and_security_view.dart';
-import 'package:untitled/views/change_password_view.dart';
-import 'package:untitled/views/register_view.dart';
-import 'package:untitled/views/goals_view.dart';
-import 'package:untitled/views/profile_view.dart';
-import 'package:untitled/views/verify_email_view.dart';
-import 'package:untitled/views/update_password_view.dart';
+import 'package:untitled/views/ChangePasswordView.dart';
+import 'package:untitled/views/CurrenciesView.dart';
+import 'package:untitled/views/GoalsView.dart';
+import 'package:untitled/views/HelpView.dart';
+import 'package:untitled/views/LoginView.dart';
+import 'package:untitled/views/NotificationsView.dart';
+import 'package:untitled/views/PrivacyAndSecurityView.dart';
+import 'package:untitled/views/ProfileView.dart';
+import 'package:untitled/views/RegisterView.dart';
+import 'package:untitled/views/TransactionsView.dart';
+import 'package:untitled/views/UpdatePasswordView.dart';
+import 'package:untitled/views/VerifyEmailView.dart';
 
 
 

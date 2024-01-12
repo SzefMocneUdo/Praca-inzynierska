@@ -4,10 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'card_components/card_style_picker.dart';
-import 'card_components/card_styles.dart';
-import 'card_components/card_utilis.dart';
-import 'card_components/input_formatters.dart';
+import 'card_components/CardStyles.dart';
+import 'card_components/InputFormatters.dart';
+import 'card_components/CardStylePicker.dart';
+import 'card_components/CardUtilis.dart';
 
 class AddCreditCardScreen extends StatefulWidget {
   @override

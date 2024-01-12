@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
-import 'package:untitled/views/currencies_view.dart';
+
+import 'CurrenciesView.dart';
 
 class CurrencyConvrterScreen extends StatefulWidget {
   const CurrencyConvrterScreen({Key? key}) : super(key: key);

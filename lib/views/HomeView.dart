@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../model/ExpenseData.dart';
-import 'notifications_view.dart';
+import 'NotificationsView.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key});

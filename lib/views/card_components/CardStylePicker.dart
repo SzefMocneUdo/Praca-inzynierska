@@ -1,8 +1,7 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'card_styles.dart';
+import 'CardStyles.dart';
 
 class CardStylePicker extends StatefulWidget {
   final ValueChanged<Widget?> onStyleSelected;

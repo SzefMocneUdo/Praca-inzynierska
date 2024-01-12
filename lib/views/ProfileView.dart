@@ -1,12 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
-import 'package:untitled/views/notifications_view.dart';
+import 'package:untitled/views/NotificationsView.dart';
 
-import 'change_password_view.dart';
+import 'ChangePasswordView.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key});

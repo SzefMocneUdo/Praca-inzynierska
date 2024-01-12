@@ -2,14 +2,13 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/Expense.dart';
 import '../model/FinancialItem.dart';
 import '../model/Income.dart';
-import 'financialItemDetailsDialog.dart';
-import 'notifications_view.dart';
+import 'FinancialItemDetailsDialog.dart';
+import 'NotificationsView.dart';
 
 class Transactions extends StatefulWidget {
   const Transactions({Key? key}) : super(key: key);

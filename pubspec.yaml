@@ -44,6 +44,7 @@ dependencies:
   currency_picker: ^2.0.19
   flutter_svg: ^2.0.9
   flip_card: ^0.7.0
+  table_calendar: ^3.0.8
 #  awesome_card: ^1.1.7
 
   # The following adds the Cupertino Icons font to your application.

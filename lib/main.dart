@@ -5,6 +5,7 @@ import 'package:untitled/constants/routes.dart';
 import 'package:untitled/firebase_options.dart';
 import 'package:untitled/views/AddCreditCardScreen.dart';
 import 'package:untitled/views/BottomMenuView.dart';
+import 'package:untitled/views/Calendar.dart';
 import 'package:untitled/views/CardListView.dart';
 import 'package:untitled/views/ChangePasswordView.dart';
 import 'package:untitled/views/CurrenciesView.dart';
@@ -44,7 +45,8 @@ void main() {
       helpRoute: (context) => HelpView(),
       updatePasswordRoute: (context) => UpdatePasswordView(),
       creditCard: (context) => AddCreditCardScreen(),
-      cardsRoute: (context) => CardListView()
+      cardsRoute: (context) => CardListView(),
+      calendarRoute: (context) =>TransactionCalendar()
     },
   ));
 }

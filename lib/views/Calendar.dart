@@ -1,7 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:untitled/views/FinancialItemDetailsDialog.dart';
 
 import '../model/Expense.dart';
 import '../model/FinancialItem.dart';
@@ -20,6 +23,11 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
   DateTime? selectedDay;
   List<FinancialItem> selectedDayTransactions = [];
   CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+  int _currentCarouselPage = 0;
+  final CarouselController _carouselController = CarouselController();
+  DateTime _startRange = DateTime.now();
+  DateTime _endRange = DateTime.now().add(Duration(days: 7));
+  List<FinancialItem> _filteredTransactions = [];
 
   @override
   void initState() {
@@ -83,53 +91,229 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
     });
   }
 
+  Future<void> _selectDateRange() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2010),
+      lastDate: DateTime(2030),
+      initialDateRange: DateTimeRange(start: _startRange, end: _endRange),
+    );
+    if (picked != null &&
+        picked != DateTimeRange(start: _startRange, end: _endRange)) {
+      setState(() {
+        _startRange = picked.start;
+        _endRange = picked.end;
+      });
+    }
+  }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Transaction Calendar'),
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         CarouselSlider(
+  //           carouselController: _carouselController,
+  //           items: [_buildCalendarView(), _buildDateRangePickerView()],
+  //           options: CarouselOptions(
+  //             height: 400,
+  //             initialPage: 0,
+  //             enableInfiniteScroll: false,
+  //             onPageChanged: (index, reason) {
+  //               setState(() {
+  //                 _currentCarouselPage = index;
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         Expanded(
+  //           // Use Expanded to take up remaining space
+  //           child: _buildTransactionList(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  void _filterTransactionsByDateRange() {
+    setState(() {
+      _filteredTransactions = allFinancialData.where((transaction) {
+        return transaction.date.isAfter(_startRange) &&
+            transaction.date.isBefore(_endRange);
+      }).toList();
+    });
+  }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Transaction Calendar'),
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         CarouselSlider(
+  //           carouselController: _carouselController,
+  //           items: [_buildCalendarView(), _buildDateRangePickerView()],
+  //           options: CarouselOptions(
+  //             height: 400,
+  //             initialPage: 0,
+  //             enableInfiniteScroll: false,
+  //             enlargeCenterPage: true,
+  //             autoPlay: false,
+  //             aspectRatio: 2.0,
+  //             onPageChanged: (index, reason) {
+  //               setState(() {
+  //                 _currentCarouselPage = index;
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         // Możesz dodać więcej widgetów tutaj, jeśli potrzebujesz
+  //         Expanded(
+  //           child: _buildTransactionList(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Transaction Calendar'),
-        ),
-        body: Column(
-          children: [
-            TableCalendar(
-              firstDay: DateTime.utc(2010, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: focusedDay,
-              selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-              calendarFormat: _calendarFormat,
-              onFormatChanged: _onFormatChanged,
-              onDaySelected: (selectedDay, focusedDay) {
+      appBar: AppBar(
+        title: Text('Transaction Calendar'),
+      ),
+      body: Column(
+        children: [
+          CarouselSlider(
+            carouselController: _carouselController,
+            items: [_buildCalendarView(), _buildDateRangePickerView()],
+            options: CarouselOptions(
+              height: 400,
+              initialPage: 0,
+              enableInfiniteScroll: false,
+              enlargeCenterPage: true,
+              autoPlay: false,
+              aspectRatio: 2.0,
+              onPageChanged: (index, reason) {
                 setState(() {
-                  this.selectedDay = selectedDay;
-                  this.focusedDay = focusedDay;
-                  _updateTransactionsForSelectedDay(selectedDay);
+                  _currentCarouselPage = index;
                 });
               },
-              calendarBuilders: CalendarBuilders(
-                markerBuilder: (context, date, events) {
-                  var count = events.length;
-                  if (count > 0) {
-                    return Positioned(
-                      right: 1,
-                      bottom: 1,
-                      child: _buildEventsMarker(count),
-                    );
-                  }
-                },
-              ),
-              eventLoader: (day) {
-                return transactionsByDate[
-                        DateTime(day.year, day.month, day.day)] ??
-                    [];
-              },
+            ),
+          ),
+          _buildCarouselIndicators(), // Kropki paginacji
+          _buildTransactionListForCurrentView(), // Wyświetla listę transakcji
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionListForCurrentView() {
+    List<FinancialItem> transactionsToShow = [];
+
+    if (_currentCarouselPage == 0 && selectedDay != null) {
+      // Wyświetl transakcje dla wybranego dnia
+      transactionsToShow = transactionsByDate[DateTime(
+              selectedDay!.year, selectedDay!.month, selectedDay!.day)] ??
+          [];
+    } else if (_currentCarouselPage == 1) {
+      // Wyświetl transakcje dla wybranego zakresu dat
+      transactionsToShow = _filteredTransactions;
+    }
+
+    if (transactionsToShow.isEmpty) {
+      return Expanded(
+        child: Center(child: Text("Brak transakcji")),
+      );
+    }
+
+    return Expanded(
+      child: ListView.builder(
+        itemCount: transactionsToShow.length,
+        itemBuilder: (context, index) {
+          var transaction = transactionsToShow[index];
+          return ListTile(
+            title: Text(transaction.name),
+            subtitle: Text(transaction is Expense ? 'Wydatek' : 'Przychód'),
+            trailing: Text('\$${transaction.amount.toStringAsFixed(2)}'),
+            onTap: () {
+              FinancialItemDetailsDialog(financialItem: transaction)
+                  .show(context);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCalendarView() {
+    // Tu umieść kod dla widoku kalendarza
+    return TableCalendar(
+      firstDay: DateTime.utc(2010, 1, 1),
+      lastDay: DateTime.utc(2030, 12, 31),
+      focusedDay: focusedDay,
+      selectedDayPredicate: (day) => isSameDay(selectedDay, day),
+      calendarFormat: _calendarFormat,
+      onFormatChanged: _onFormatChanged,
+      onDaySelected: (selectedDay, focusedDay) {
+        setState(() {
+          this.selectedDay = selectedDay;
+          this.focusedDay = focusedDay;
+          _updateTransactionsForSelectedDay(selectedDay);
+        });
+      },
+      calendarBuilders: CalendarBuilders(
+        markerBuilder: (context, date, events) {
+          var count = events.length;
+          if (count > 0) {
+            return Positioned(
+              right: 1,
+              bottom: 1,
+              child: _buildEventsMarker(count),
+            );
+          }
+        },
+      ),
+      eventLoader: (day) {
+        return transactionsByDate[DateTime(day.year, day.month, day.day)] ?? [];
+      },
 // Other properties of TableCalendar
-            ),
-            Expanded(
-              // Use Expanded to take up remaining space
-              child: _buildTransactionList(),
-            ),
-          ],
-        ));
+    );
+  }
+
+  Widget _buildDateRangePickerView() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: _selectDateRange,
+            child: Text('Wybierz zakres dat'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Wybrany zakres dat:',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '${DateFormat('yyyy-MM-dd').format(_startRange)} do ${DateFormat('yyyy-MM-dd').format(_endRange)}',
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _filterTransactionsByDateRange,
+            child: Text('Pokaż'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _updateTransactionsForSelectedDay(DateTime day) {
@@ -139,6 +323,62 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
           transactionsByDate[DateTime(day.year, day.month, day.day)] ?? [];
       print('Selected Day Transactions: $selectedDayTransactions'); // Debug
     });
+  }
+
+  Widget _buildCarouselIndicators() {
+    List<Widget> indicators = [];
+    for (int i = 0; i < 2; i++) {
+      indicators.add(Container(
+        width: 8.0,
+        height: 8.0,
+        margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _currentCarouselPage == i
+              ? Colors.blue // Kolor aktywnej strony
+              : Colors.grey, // Kolor nieaktywnej strony
+        ),
+      ));
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: indicators,
+    );
+  }
+
+  Widget _buildTransactionTable(List<FinancialItem> transactionsToShow) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: [
+          DataColumn(label: Text('Nazwa i Typ')),
+          DataColumn(label: Text('Kwota')),
+        ],
+        rows: transactionsToShow.map((transaction) {
+          return DataRow(
+            cells: [
+              DataCell(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(transaction.name),
+                    Text(transaction is Expense ? 'Wydatek' : 'Przychód',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+                onTap: () {
+                  FinancialItemDetailsDialog(financialItem: transaction)
+                      .show(context);
+                },
+              ),
+              DataCell(
+                Text('\$${transaction.amount.toStringAsFixed(2)}'),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Widget _buildTransactionList() {
@@ -159,21 +399,21 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       },
     );
   }
-}
 
-Widget _buildEventsMarker(int count) {
-  return Container(
-    padding: EdgeInsets.all(2),
-    decoration: BoxDecoration(
-      shape: BoxShape.rectangle,
-      color: Colors.blue,
-    ),
-    child: Text(
-      '$count',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 12.0,
+  Widget _buildEventsMarker(int count) {
+    return Container(
+      padding: EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        color: Colors.blue,
       ),
-    ),
-  );
+      child: Text(
+        '$count',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12.0,
+        ),
+      ),
+    );
+  }
 }

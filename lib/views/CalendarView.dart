@@ -16,8 +16,7 @@ class TransactionCalendar extends StatefulWidget {
 }
 
 class _TransactionCalendarState extends State<TransactionCalendar> {
-  Map<DateTime, List<FinancialItem>> transactionsByDate =
-      {}; // Initialize as an empty map
+  Map<DateTime, List<FinancialItem>> transactionsByDate = {};
   List<FinancialItem> allFinancialData = [];
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
@@ -107,37 +106,6 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
     }
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Transaction Calendar'),
-  //     ),
-  //     body: Column(
-  //       children: [
-  //         CarouselSlider(
-  //           carouselController: _carouselController,
-  //           items: [_buildCalendarView(), _buildDateRangePickerView()],
-  //           options: CarouselOptions(
-  //             height: 400,
-  //             initialPage: 0,
-  //             enableInfiniteScroll: false,
-  //             onPageChanged: (index, reason) {
-  //               setState(() {
-  //                 _currentCarouselPage = index;
-  //               });
-  //             },
-  //           ),
-  //         ),
-  //         Expanded(
-  //           // Use Expanded to take up remaining space
-  //           child: _buildTransactionList(),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   void _filterTransactionsByDateRange() {
     setState(() {
       _filteredTransactions = allFinancialData.where((transaction) {
@@ -146,40 +114,6 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       }).toList();
     });
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Transaction Calendar'),
-  //     ),
-  //     body: Column(
-  //       children: [
-  //         CarouselSlider(
-  //           carouselController: _carouselController,
-  //           items: [_buildCalendarView(), _buildDateRangePickerView()],
-  //           options: CarouselOptions(
-  //             height: 400,
-  //             initialPage: 0,
-  //             enableInfiniteScroll: false,
-  //             enlargeCenterPage: true,
-  //             autoPlay: false,
-  //             aspectRatio: 2.0,
-  //             onPageChanged: (index, reason) {
-  //               setState(() {
-  //                 _currentCarouselPage = index;
-  //               });
-  //             },
-  //           ),
-  //         ),
-  //         // Możesz dodać więcej widgetów tutaj, jeśli potrzebujesz
-  //         Expanded(
-  //           child: _buildTransactionList(),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +140,8 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
               },
             ),
           ),
-          _buildCarouselIndicators(), // Kropki paginacji
-          _buildTransactionListForCurrentView(), // Wyświetla listę transakcji
+          _buildCarouselIndicators(),
+          _buildTransactionListForCurrentView(),
         ],
       ),
     );
@@ -217,18 +151,16 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
     List<FinancialItem> transactionsToShow = [];
 
     if (_currentCarouselPage == 0 && selectedDay != null) {
-      // Wyświetl transakcje dla wybranego dnia
       transactionsToShow = transactionsByDate[DateTime(
               selectedDay!.year, selectedDay!.month, selectedDay!.day)] ??
           [];
     } else if (_currentCarouselPage == 1) {
-      // Wyświetl transakcje dla wybranego zakresu dat
       transactionsToShow = _filteredTransactions;
     }
 
     if (transactionsToShow.isEmpty) {
       return Expanded(
-        child: Center(child: Text("Brak transakcji")),
+        child: Center(child: Text("No available transactions")),
       );
     }
 
@@ -239,7 +171,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
           var transaction = transactionsToShow[index];
           return ListTile(
             title: Text(transaction.name),
-            subtitle: Text(transaction is Expense ? 'Wydatek' : 'Przychód'),
+            subtitle: Text(transaction is Expense ? 'Expense' : 'Income'),
             trailing: Text('\$${transaction.amount.toStringAsFixed(2)}'),
             onTap: () {
               FinancialItemDetailsDialog(financialItem: transaction)
@@ -252,7 +184,6 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
   }
 
   Widget _buildCalendarView() {
-    // Tu umieść kod dla widoku kalendarza
     return TableCalendar(
       firstDay: DateTime.utc(2010, 1, 1),
       lastDay: DateTime.utc(2030, 12, 31),
@@ -282,7 +213,6 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       eventLoader: (day) {
         return transactionsByDate[DateTime(day.year, day.month, day.day)] ?? [];
       },
-// Other properties of TableCalendar
     );
   }
 
@@ -294,11 +224,11 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
         children: [
           ElevatedButton(
             onPressed: _selectDateRange,
-            child: Text('Wybierz zakres dat'),
+            child: Text('Choose the range of dates'),
           ),
           SizedBox(height: 8),
           Text(
-            'Wybrany zakres dat:',
+            'Chosen rage of dates:',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 8),
@@ -321,7 +251,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       selectedDay = day;
       selectedDayTransactions =
           transactionsByDate[DateTime(day.year, day.month, day.day)] ?? [];
-      print('Selected Day Transactions: $selectedDayTransactions'); // Debug
+      print('Selected Day Transactions: $selectedDayTransactions');
     });
   }
 
@@ -334,9 +264,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
         margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _currentCarouselPage == i
-              ? Colors.blue // Kolor aktywnej strony
-              : Colors.grey, // Kolor nieaktywnej strony
+          color: _currentCarouselPage == i ? Colors.blue : Colors.grey,
         ),
       ));
     }
@@ -351,8 +279,8 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: [
-          DataColumn(label: Text('Nazwa i Typ')),
-          DataColumn(label: Text('Kwota')),
+          DataColumn(label: Text('Name and type')),
+          DataColumn(label: Text('Price')),
         ],
         rows: transactionsToShow.map((transaction) {
           return DataRow(
@@ -362,7 +290,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(transaction.name),
-                    Text(transaction is Expense ? 'Wydatek' : 'Przychód',
+                    Text(transaction is Expense ? 'Expense' : 'Income',
                         style: TextStyle(fontSize: 12, color: Colors.grey)),
                   ],
                 ),
@@ -390,7 +318,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
       itemCount: selectedDayTransactions.length,
       itemBuilder: (context, index) {
         var transaction = selectedDayTransactions[index];
-        print('Displaying transaction: $transaction'); // Debug
+        print('Displaying transaction: $transaction');
         return ListTile(
           title: Text(transaction.name),
           subtitle: Text(transaction is Expense ? 'Expense' : 'Income'),

@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:untitled/constants/routes.dart';
 
 class LoginView extends StatefulWidget {
@@ -111,7 +110,7 @@ class _LoginViewState extends State<LoginView> {
               emailIconColor = Colors.grey;
               passwordIconColor = Colors.blue;
             }
-            loginErrorMessage = null; // Reset the error message when the user taps on the text field
+            loginErrorMessage = null;
           });
         },
       ),
@@ -205,7 +204,6 @@ class _LoginViewState extends State<LoginView> {
                                 child: TextButton(
                                   onPressed: () async {
                                     await userCredential.user?.sendEmailVerification();
-                                    // Navigator.of(context).pop();
                                     _showEmailSentDialog();
                                   },
                                   child: Text('Send verification email'),

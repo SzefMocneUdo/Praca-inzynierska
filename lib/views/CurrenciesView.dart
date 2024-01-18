@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
-import 'currencyConverterScreen.dart';
-import 'notifications_view.dart';
-import 'followExchangeRatesScreen.dart';
+import '../model/Currency.dart';
+import 'CurrencyConverterScreen.dart';
+import 'FollowExchangeRatesScreen.dart';
+import 'NotificationsView.dart';
+
 
 class CurrenciesView extends StatefulWidget {
   const CurrenciesView({Key? key});

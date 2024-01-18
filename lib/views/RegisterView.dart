@@ -10,7 +10,7 @@ class CustomUser {
   final String email;
   final String username;
   final String hashedPassword;
-  final String currency; // Add currency property
+  final String currency;
 
   CustomUser({
     required this.uid,
@@ -37,7 +37,7 @@ class CustomUser {
         'username': username,
         'email': email,
         'hashedPassword': hashedPassword,
-        'currency':currency
+        'currency': currency
       });
     } catch (e) {
       print('Error saving user to Firestore: $e');
@@ -62,8 +62,7 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
-  String
-      _selectedCurrency = ''; // Add a property to store the selected currency
+  String _selectedCurrency = '';
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -158,7 +157,8 @@ class _RegisterViewState extends State<RegisterView> {
               emailIconColor = Colors.grey;
               passwordIconColor = Colors.grey;
               confirmPasswordIconColor = Colors.grey;
-            } else if (controller == _email) {
+            }
+            else if (controller == _email) {
               usernameBorderColor = Colors.grey;
               emailBorderColor = Colors.blue;
               passwordBorderColor = Colors.grey;
@@ -254,8 +254,6 @@ class _RegisterViewState extends State<RegisterView> {
       },
     );
   }
-
-
 
   void _showEmailSentDialog() {
     showDialog(
@@ -476,15 +474,15 @@ class _RegisterViewState extends State<RegisterView> {
                       final confirmPassword = _confirmPassword.text;
 
                       try {
-                        // Sprawdź, czy hasło i potwierdzenie hasła są zgodne
                         if (password != confirmPassword) {
                           _errorMessages.add('Passwords do not match');
                           _showErrorDialog(_errorMessages);
                           _errorMessages = [];
                           return;
                         }
-                        if(_selectedCurrency.isEmpty){
-                          _errorMessages.add('You have to choose main currency');
+                        if (_selectedCurrency.isEmpty) {
+                          _errorMessages
+                              .add('You have to choose main currency');
                           _showErrorDialog(_errorMessages);
                           _errorMessages = [];
                           return;

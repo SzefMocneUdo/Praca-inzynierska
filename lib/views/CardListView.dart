@@ -3,15 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'card_components/card_styles.dart';
-import 'card_components/card_utilis.dart';
+import 'card_components/CardStyles.dart';
+import 'card_components/CardUtilis.dart';
 
 class PaymentCard {
   final CardType type;
   final String number;
   final String name;
-  final int month; // Updated to int
-  final int year; // Updated to int
+  final int month;
+  final int year;
   final String cvv;
 
   PaymentCard({
@@ -71,7 +71,6 @@ class _CardListViewState extends State<CardListView> {
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Zaktualizuj flagę showBack dla konkretnej karty
                       setState(() {
                         showBackList[index] = !showBackList[index];
                       });
@@ -81,7 +80,7 @@ class _CardListViewState extends State<CardListView> {
                       cardExpiry: "${card.month}/${card.year}",
                       cardHolderName: card.name,
                       cvv: card.cvv,
-                      showBackSide: showBackList[index], // Ustaw showBack dla konkretnej karty
+                      showBackSide: showBackList[index],
                       frontBackground: CardStyles.customGradient(CardStyles.blueGradient),
                       backBackground: CardStyles.customGradient(CardStyles.blueGradient),
                       showShadow: true,
@@ -110,7 +109,7 @@ class _CardListViewState extends State<CardListView> {
         .get();
 
     if (showBackList.isEmpty) {
-      _initShowBackList(); // Inicjalizacja listy flag showBack tylko raz przed pętlą
+      _initShowBackList();
     }
 
     List<PaymentCard> cards = [];
@@ -119,7 +118,7 @@ class _CardListViewState extends State<CardListView> {
       cards.add(card);
 
       if (showBackList.length <= cards.length) {
-        showBackList.add(false); // Dla każdej nowej karty dodaj domyślną wartość false
+        showBackList.add(false);
       }
     });
 
@@ -131,8 +130,8 @@ class _CardListViewState extends State<CardListView> {
       type: CardUtils.getCardType(cardSnapshot['cardNumber']),
       number: cardSnapshot['cardNumber'],
       name: cardSnapshot['cardHolder'],
-      month: cardSnapshot['expiryMonth'], // Assuming this is an int in Firestore
-      year: cardSnapshot['expiryYear'],   // Assuming this is an int in Firestore
+      month: cardSnapshot['expiryMonth'],
+      year: cardSnapshot['expiryYear'],
       cvv: cardSnapshot['cvv'],
     );
   }

@@ -1,27 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:currency_picker/currency_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:untitled/views/currencies_view.dart';
+import 'package:live_currency_rate/live_currency_rate.dart';
+import 'package:currency_picker/currency_picker.dart';
 
+import 'CurrenciesView.dart';
 
-class FollowExchangeRatesScreen extends StatefulWidget {
-  const FollowExchangeRatesScreen({Key? key}) : super(key: key);
+class CurrencyConvrterScreen extends StatefulWidget {
+  const CurrencyConvrterScreen({Key? key}) : super(key: key);
 
   @override
-  State<FollowExchangeRatesScreen> createState() =>
-      _FollowExchangeRatesScreenState();
+  State<CurrencyConvrterScreen> createState() => _CurrencyConvrterScreenState();
 }
 
-class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
-  String errorMessage = "";
-  bool error = false;
+class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
+  TextEditingController _amountController = TextEditingController();
+  double _exchangeRateController = 0.0;
+  double _resultController = 0.0;
   Currency? _fromController;
   Currency? _toController;
   late TextEditingController _fromCurrencyTextField;
   late TextEditingController _toCurrencyTextField;
-
+  bool error = false;
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -38,11 +40,10 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
       showCurrencyCode: true,
       onSelect: (Currency currency) {
         setState(() {
-          if(isFrom){
+          if (isFrom) {
             _fromController = currency;
             _fromCurrencyTextField.text = currency.name;
-          }
-          else{
+          } else {
             _toController = currency;
             _toCurrencyTextField.text = currency.name;
           }
@@ -52,12 +53,13 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   }
 
   Widget _buildCurrencyPickerTextField(bool isFrom) {
-    if(isFrom){
+    if (isFrom) {
       return TextFormField(
         controller: _fromCurrencyTextField,
         readOnly: true,
         decoration: InputDecoration(
-          hintText: _fromController != null ? _fromController!.name : 'Currency',
+          hintText:
+              _fromController != null ? _fromController!.name : 'Currency',
           prefixIcon: Icon(
             Icons.attach_money,
             color: Colors.grey,
@@ -82,8 +84,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
         ),
         style: TextStyle(color: Colors.black),
       );
-    }
-    else{
+    } else {
       return TextFormField(
         controller: _toCurrencyTextField,
         readOnly: true,
@@ -116,74 +117,6 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
     }
   }
 
-  Future<bool> checkIfObjectExists(
-      FirebaseFirestore firestore, String fromValue, String toValue) async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if(user != null){
-        QuerySnapshot querySnapshot = await firestore
-            .collection('followedCurrencies')
-            .where('from', isEqualTo: fromValue)
-            .where('to', isEqualTo: toValue)
-            .where('userId', isEqualTo: user.uid)
-            .get();
-
-        return querySnapshot.docs.isNotEmpty;
-      }
-      else{
-        print("User does not exist");
-        return false;
-      }
-
-    } catch (e) {
-      print('Wystąpił błąd: $e');
-      throw e;
-    }
-  }
-
-
-  void _addCurrencies() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        FirebaseFirestore firestore = FirebaseFirestore.instance;
-        bool exists = await checkIfObjectExists(
-          firestore,
-          _fromController?.code ?? '',
-          _toController?.code ?? '',
-        );
-        if (exists) {
-          error = true;
-          errorMessage = "Object already exists";
-          print("Object already exists");
-        } else if (_fromController == null || _toController == null) {
-          error = true;
-          errorMessage = "Currency is required";
-          print("Currency is required");
-        } else {
-          error = false;
-          firestore.collection('followedCurrencies').add({
-            'from': _fromController?.code ?? '',
-            'to': _toController?.code ?? '',
-            "userId": user.uid
-          });
-          print('Currency rate added successfully!');
-        }
-      } else {
-        print('User not logged in.');
-      }
-    } catch (e) {
-      print('Error encountered when adding currency rate: $e');
-    }
-
-    if (error) {
-      showErrorDialog(context, 'Error', errorMessage);
-      return;
-    }
-
-    Navigator.pop(context);
-  }
-
   void showErrorDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -208,7 +141,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Follow Exchange Rates'),
+          title: const Text('Currency Converter'),
           backgroundColor: Colors.blueAccent,
           leading: GestureDetector(
             child: Icon(
@@ -262,19 +195,81 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
               ),
               SizedBox(height: 5),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: _buildCurrencyPickerTextField(false),
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: _buildCurrencyPickerTextField(false)),
+              SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 8),
+                child: Text(
+                  'Amount:',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 5),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32),
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(),
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
               ),
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
-                  _addCurrencies();
+                  String amountText = _amountController.text;
+                  double amount = double.tryParse(amountText) ?? 0.0;
+
+                  if (_fromController == null || _toController == null ) {
+                    setState(() {
+                      errorMessage = "Currency is required";
+                    });
+                    showErrorDialog(context, 'Error', errorMessage);
+                    return;
+                  }
+                  else if(amount == 0.0){
+                    setState(() {
+                      errorMessage = "Amount is required";
+                    });
+                    showErrorDialog(context, 'Error', errorMessage);
+                    return;
+                  }
+                  else{
+                    String fromCode = _fromController!.code ?? "";
+                    String toCode = _toController!.code ?? "";
+
+                    CurrencyRate rate = await LiveCurrencyRate.convertCurrency(
+                        fromCode, toCode, amount);
+                    _exchangeRateController = rate.result / amount;
+
+                    setState(() {
+                      _resultController = rate.result;
+                    });
+                  }
+
+
                 },
                 child: Text(
-                  'Save',
+                  'Convert',
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              SizedBox(height: 20),
+              Text(
+                "Exchange rate: " + _exchangeRateController.toStringAsFixed(2),
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(height: 40),
+              Text(
+                _resultController.toStringAsFixed(2),
+                style: TextStyle(fontSize: 50),
+              )
             ],
           ),
         ));

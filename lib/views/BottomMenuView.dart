@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/views/profile_view.dart';
+import 'package:untitled/views/ProfileView.dart';
 
-import 'addCreditCardScreen.dart';
-import 'addExpenseScreen.dart';
-import 'addFinancialGoalScreen.dart';
-import 'addIncomeScreen.dart';
-import 'currencies_view.dart';
-import 'transactions_view.dart';
-import 'goals_view.dart';
-import 'home_view.dart';
+import 'AddCreditCardScreen.dart';
+import 'AddExpenseScreen.dart';
+import 'AddFinancialGoalScreen.dart';
+import 'AddIncomeScreen.dart';
+import 'CurrenciesView.dart';
+import 'GoalsView.dart';
+import 'HomeView.dart';
+import 'TransactionsView.dart';
 
 class MainView extends StatefulWidget {
   const MainView({Key? key});

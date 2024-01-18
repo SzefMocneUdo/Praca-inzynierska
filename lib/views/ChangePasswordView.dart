@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
-import 'dart:developer' as devtools show log;
-import 'notifications_view.dart';
+
+import 'NotificationsView.dart';
 
 class ChangePasswordView extends StatefulWidget {
   const ChangePasswordView({Key? key});

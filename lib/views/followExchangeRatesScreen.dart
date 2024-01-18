@@ -6,8 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:untitled/views/currencies_view.dart';
 
 
-
-
 class FollowExchangeRatesScreen extends StatefulWidget {
   const FollowExchangeRatesScreen({Key? key}) : super(key: key);
 
@@ -17,11 +15,13 @@ class FollowExchangeRatesScreen extends StatefulWidget {
 }
 
 class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
-  List<String> currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "PLN"];
+  String errorMessage = "";
+  bool error = false;
   Currency? _fromController;
   Currency? _toController;
   late TextEditingController _fromCurrencyTextField;
   late TextEditingController _toCurrencyTextField;
+
 
   @override
   void initState() {
@@ -142,41 +142,66 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   }
 
 
-  // Metoda do zapisywania przeliczników do kolekcji followedCurrencies
-  void _addCurrencies() async{
+  void _addCurrencies() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
         FirebaseFirestore firestore = FirebaseFirestore.instance;
-
         bool exists = await checkIfObjectExists(
           firestore,
           _fromController?.code ?? '',
           _toController?.code ?? '',
         );
-
-
-        if(exists){
+        if (exists) {
+          error = true;
+          errorMessage = "Object already exists";
           print("Object already exists");
-        }
-        else{
+        } else if (_fromController == null || _toController == null) {
+          error = true;
+          errorMessage = "Currency is required";
+          print("Currency is required");
+        } else {
+          error = false;
           firestore.collection('followedCurrencies').add({
             'from': _fromController?.code ?? '',
             'to': _toController?.code ?? '',
             "userId": user.uid
           });
-
           print('Currency rate added successfully!');
         }
       } else {
         print('User not logged in.');
       }
     } catch (e) {
-      print('Error adding currency rate: $e');
+      print('Error encountered when adding currency rate: $e');
+    }
+
+    if (error) {
+      showErrorDialog(context, 'Error', errorMessage);
+      return;
     }
 
     Navigator.pop(context);
+  }
+
+  void showErrorDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -220,7 +245,8 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: _buildCurrencyPickerTextField(true),
               ),
               SizedBox(height: 30),
@@ -235,17 +261,14 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: _buildCurrencyPickerTextField(false),
               ),
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
-                  // SharedPreferences prefs = await SharedPreferences.getInstance();
-                  // await prefs.setString('fromCurrency', _fromController);
-                  // await prefs.setString('toCurrency', _toController);
-
-                  _addCurrencies(); // Zamknięcie bieżącego ekranu
+                  _addCurrencies();
                 },
                 child: Text(
                   'Save',

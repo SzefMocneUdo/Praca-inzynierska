@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
@@ -19,6 +21,8 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
   Currency? _toController;
   late TextEditingController _fromCurrencyTextField;
   late TextEditingController _toCurrencyTextField;
+  bool error = false;
+  String errorMessage = "";
 
   @override
   void initState() {
@@ -35,11 +39,10 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
       showCurrencyCode: true,
       onSelect: (Currency currency) {
         setState(() {
-          if(isFrom){
+          if (isFrom) {
             _fromController = currency;
             _fromCurrencyTextField.text = currency.name;
-          }
-          else{
+          } else {
             _toController = currency;
             _toCurrencyTextField.text = currency.name;
           }
@@ -49,12 +52,13 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
   }
 
   Widget _buildCurrencyPickerTextField(bool isFrom) {
-    if(isFrom){
+    if (isFrom) {
       return TextFormField(
         controller: _fromCurrencyTextField,
         readOnly: true,
         decoration: InputDecoration(
-          hintText: _fromController != null ? _fromController!.name : 'Currency',
+          hintText:
+              _fromController != null ? _fromController!.name : 'Currency',
           prefixIcon: Icon(
             Icons.attach_money,
             color: Colors.grey,
@@ -79,8 +83,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
         ),
         style: TextStyle(color: Colors.black),
       );
-    }
-    else{
+    } else {
       return TextFormField(
         controller: _toCurrencyTextField,
         readOnly: true,
@@ -111,6 +114,26 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
         style: TextStyle(color: Colors.black),
       );
     }
+  }
+
+  void showErrorDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -154,7 +177,8 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: _buildCurrencyPickerTextField(true),
               ),
               SizedBox(height: 30),
@@ -169,7 +193,9 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(child: _buildCurrencyPickerTextField(false)),
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: _buildCurrencyPickerTextField(false)),
               SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.only(left: 20, top: 8),
@@ -182,37 +208,51 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              Container(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32),
                 child: TextField(
                   controller: _amountController,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                  ),
+                  decoration: InputDecoration(),
                   style: TextStyle(
-                    fontSize: 20, // Powiększenie tekstu pola
+                    fontSize: 20,
                   ),
                 ),
-                width: 300,
               ),
-
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   String amountText = _amountController.text;
                   double amount = double.tryParse(amountText) ?? 0.0;
 
-                  if (_fromController == null || _toController == null) {
+                  if (_fromController == null || _toController == null ) {
+                    setState(() {
+                      errorMessage = "Currency is required";
+                    });
+                    showErrorDialog(context, 'Error', errorMessage);
                     return;
                   }
-                  String fromCode = _fromController!.code ?? "";
-                  String toCode = _toController!.code ?? "";
+                  else if(amount == 0.0){
+                    setState(() {
+                      errorMessage = "Amount is required";
+                    });
+                    showErrorDialog(context, 'Error', errorMessage);
+                    return;
+                  }
+                  else{
+                    String fromCode = _fromController!.code ?? "";
+                    String toCode = _toController!.code ?? "";
 
-                  CurrencyRate rate = await LiveCurrencyRate.convertCurrency(fromCode, toCode, amount);
-                  _exchangeRateController = rate.result / amount;
+                    CurrencyRate rate = await LiveCurrencyRate.convertCurrency(
+                        fromCode, toCode, amount);
+                    _exchangeRateController = rate.result / amount;
 
-                  setState(() {
-                    _resultController = rate.result;
-                  });
+                    setState(() {
+                      _resultController = rate.result;
+                    });
+                  }
+
+
                 },
                 child: Text(
                   'Convert',

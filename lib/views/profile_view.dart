@@ -47,6 +47,7 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Settings"),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
@@ -74,7 +75,7 @@ class _SettingsViewState extends State<SettingsView> {
             // "How can we help you?" section
             Center(
               child: Text(
-                'How can we help you?',
+                'How can we help You?',
                 style: TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
@@ -89,9 +90,6 @@ class _SettingsViewState extends State<SettingsView> {
             }),
             buildOption(context, "Change Email", () {
               // Dodaj logikę zmiany emaila
-            }),
-            buildOption(context, "Add Phone Number", () {
-              // Dodaj logikę dodawania numeru telefonu
             }),
             buildOption(context, "2FA Verification", () {
               // Dodaj logikę dwuetapowej weryfikacji
@@ -117,9 +115,6 @@ class _SettingsViewState extends State<SettingsView> {
             SizedBox(height: 20),
             // "Accessibility" section
             buildSectionTitle("Accessibility"),
-            buildOption(context, "Language", () {
-              // Dodaj logikę zmiany języka
-            }),
             buildOption(context, "Display Mode", () {
               // Dodaj logikę zmiany trybu wyświetlania
             }),

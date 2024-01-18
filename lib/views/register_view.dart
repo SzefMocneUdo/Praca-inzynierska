@@ -311,7 +311,7 @@ class _RegisterViewState extends State<RegisterView> {
       showCurrencyCode: true,
       onSelect: (Currency currency) {
         setState(() {
-          _selectedCurrency = currency.name;
+          _selectedCurrency = currency.code;
         });
       },
     );

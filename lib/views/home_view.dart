@@ -16,13 +16,64 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   List<ExpenseData> expenseDataList = [];
   List<ExpenseData> recentExpenses = [];
+
+  //List<ExpenseData> expensesMainCurrency = [];
   bool hasExpenses = false;
+  bool hasExpenseWithUserCurrency = false;
   User? user = FirebaseAuth.instance.currentUser;
+  String userCurrency = "";
+  List<Map<String, dynamic>> expensesData = [];
+  List<FlSpot> lineChartSpots = [];
 
   @override
   void initState() {
     super.initState();
     _fetchRecentExpenses();
+    _getUserCurrency();
+    _loadExpensesDataLast7Days();
+  }
+
+  void _loadExpensesDataLast7Days() async {
+    expensesData = await getExpensesLast7Days(user!.uid.toString());
+
+    lineChartSpots = generateSpotsForLast7Days();
+
+    for (var expenseMap in expensesData) {
+      print("Expense data:");
+      expenseMap.forEach((key, value) {
+        print("$key: $value");
+      });
+      print("--------------");
+    }
+    setState(() {}); // Aktualizacja interfejsu użytkownika po pobraniu danych
+  }
+
+
+  void _getUserCurrency() async {
+    try {
+      final user = this.user;
+      if (user != null) {
+        FirebaseFirestore firestore = FirebaseFirestore.instance;
+        QuerySnapshot querySnapshot = await firestore
+            .collection('users')
+            .where('email', isEqualTo: user.email)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          userCurrency = querySnapshot.docs.first.get('currency');
+
+          if (userCurrency != "") {
+            print('Wartość pola "currency" to: $userCurrency');
+          } else {
+            print('Pole "currency" nie ma wartości lub jest null.');
+          }
+        } else {
+          print('Brak dokumentu dla podanego adresu e-mail.');
+        }
+      }
+    } catch (e) {
+      print("Error fetching user currecy: $e");
+    }
   }
 
   void _fetchRecentExpenses() async {
@@ -42,16 +93,80 @@ class _HomeViewState extends State<HomeView> {
             recentExpenses = List.empty();
             hasExpenses = false;
           });
-        } else {
+        }
+          else {
           setState(() {
             recentExpenses = prepareExpenseData(querySnapshot);
             hasExpenses = true;
+
+            for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+              Map<String, dynamic> expenseData = doc.data() as Map<String, dynamic>;
+
+              if (expenseData.containsKey('currency') && expenseData['currency'] == userCurrency) {
+                hasExpenseWithUserCurrency = true;
+                break;
+              }
+            }
+
           });
         }
       }
     } catch (e) {
       print('Error fetching recent expenses: $e');
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getExpensesLast7Days(String userId) async {
+    final now = DateTime.now();
+    final last7Days = now.subtract(Duration(days: 7));
+
+    try {
+      QuerySnapshot currencySnapshot = await FirebaseFirestore.instance
+          .collection('currencies')
+          .where('userId', isEqualTo: userId)
+          .where('currency', isEqualTo: userCurrency)
+          .get();
+
+      DateTime now = DateTime.now();
+      DateTime last7Days = now.subtract(Duration(days: 7));
+
+      List<Map<String, dynamic>> expensesData = currencySnapshot.docs
+          .where((doc) {
+        DateTime date = (doc['date'] as Timestamp).toDate();
+        return date.isAfter(last7Days);
+      })
+          .map((doc) => {
+        'date': (doc['date'] as Timestamp).toDate(),
+        'amount': doc['amount'],
+      })
+          .toList();
+
+
+      return expensesData;
+
+      //return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } catch (e) {
+      print('Error fetching expenses: $e');
+      return [];
+    }
+  }
+
+  List<FlSpot> generateSpotsForLast7Days() {
+    List<FlSpot> spots = [];
+
+    // Iteruj przez dane i dodawaj punkty do wykresu
+    for (int i = 0; i < expensesData.length; i++) {
+      DateTime date = (expensesData[i]['date'] as Timestamp).toDate();
+      double amount = expensesData[i]['amount'].toDouble();
+
+      // Przyjmuję, że 'now' to dzisiaj, a więc biorę różnicę dni między datą wydatku a dzisiaj
+      int daysAgo = DateTime.now().difference(date).inDays;
+
+      // Dodaj punkt do wykresu
+      spots.add(FlSpot(daysAgo.toDouble(), amount));
+    }
+
+    return spots;
   }
 
   @override
@@ -70,21 +185,72 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: hasExpenses ? _buildChart() : _buildWelcomeMessage(),
+      body:
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child:
+              Column(
+                children: [
+                  hasExpenses ? _buildChartSet() : _buildWelcomeMessage(),
+                  hasExpenses ? _buildLatestExpensesList() : _buildWelcomeMessage(),
+                ],
+              )
+            ),
+    );
+  }
+
+  Widget _buildCard(Widget widget) => Container(
+    width: MediaQuery. of(context). size. width,
+    height: 200,
+    child: widget,
+  );
+
+  Widget _buildChartSet() {
+    return Container(
+      height: 350,
+      child: PageView(
+      scrollDirection: Axis.horizontal,
+      children: [
+        _buildCard(_buildPieChart()),
+        _buildCard(_buildLineChart()),
+        _buildCard(_buildPieChart()),
+      ],
+    ),
+    );
+  }
+
+  LineChart _buildLineChart() {
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(show: false),
+        titlesData: FlTitlesData(show: false),
+        minX: 0,
+        maxX: 7,
+        minY: 0,
+        maxY: 200,
+        lineBarsData: [
+          LineChartBarData(
+            spots: lineChartSpots,
+            isCurved: true,
+            colors: [Colors.blue],
+            dotData: FlDotData(show: false),
+            belowBarData: BarAreaData(show: false),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildChart() {
+
+
+  Widget _buildPieChart() {
     return Column(
       children: [
         // Sekcja: Nagłówek
         Padding(
           padding: const EdgeInsets.only(bottom: 30.0),
           child: Text(
-            'Wykres wszystkich wydatków',
+            'Graph of expenses in main currency',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
@@ -93,9 +259,8 @@ class _HomeViewState extends State<HomeView> {
           child: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
                 .collection('expenses')
-                .where('userId',
-                    isEqualTo: user
-                        ?.uid) // Dodane ograniczenie do zalogowanego użytkownika
+                .where('userId', isEqualTo: user?.uid)
+                .where('currency', isEqualTo: userCurrency)
                 .get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -173,45 +338,47 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
         ),
-        // Sekcja: Lista ostatnich 2 wydatków
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Ostatnie wydatki:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              DataTable(
-                columns: [
-                  DataColumn(label: Text('Kategoria')),
-                  DataColumn(label: Text('Kwota')),
-                ],
-                rows: recentExpenses.map((expense) {
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        Text(
-                          expense.category,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      DataCell(
-                        Text(
-                          expense.amount.toString(),
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildLatestExpensesList() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Latest expenses:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          DataTable(
+            columns: [
+              DataColumn(label: Text('Category')),
+              DataColumn(label: Text('Amount')),
+            ],
+            rows: recentExpenses.map((expense) {
+              return DataRow(
+                cells: [
+                  DataCell(
+                    Text(
+                      expense.category,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      expense.amount.toString() + " " + expense.currency,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 

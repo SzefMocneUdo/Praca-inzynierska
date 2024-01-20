@@ -45,7 +45,6 @@ dependencies:
   flutter_svg: ^2.0.9
   flip_card: ^0.7.0
   table_calendar: ^3.0.8
-  carousel_slider: ^4.0.0
 #  awesome_card: ^1.1.7
   carousel_slider: ^4.2.1
 

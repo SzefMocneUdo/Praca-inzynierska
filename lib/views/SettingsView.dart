@@ -3,9 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
+import 'package:untitled/views/FaqView.dart';
 import 'package:untitled/views/NotificationsView.dart';
-
-import 'ChangePasswordView.dart';
+import 'package:untitled/views/UpdateEmailView.dart';
+import 'UpdatePasswordView.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key});
@@ -84,11 +85,14 @@ class _SettingsViewState extends State<SettingsView> {
             buildOption(context, "Change Password", () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ChangePasswordView()),
+                MaterialPageRoute(builder: (context) => UpdatePasswordView()),
               );
             }),
             buildOption(context, "Change Email", () {
-              // Dodaj logikę zmiany emaila
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UpdateEmailView()),
+              );
             }),
             buildOption(context, "2FA Verification", () {
               // Dodaj logikę dwuetapowej weryfikacji
@@ -106,7 +110,10 @@ class _SettingsViewState extends State<SettingsView> {
             // "Support" section
             buildSectionTitle("Support"),
             buildOption(context, "FAQ", () {
-              // Dodaj logikę FAQ
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FaqView()),
+              );
             }),
             buildOption(context, "Contact", () {
               // Dodaj logikę kontaktu

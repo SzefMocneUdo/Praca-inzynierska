@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/views/ProfileView.dart';
+import 'package:untitled/views/SettingsView.dart';
 
 import 'AddCreditCardScreen.dart';
 import 'AddExpenseScreen.dart';

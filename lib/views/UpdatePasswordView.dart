@@ -13,23 +13,63 @@ class UpdatePasswordView extends StatefulWidget {
 class _UpdatePasswordViewState extends State<UpdatePasswordView> {
   final user = FirebaseAuth.instance.currentUser;
   TextEditingController _newPasswordController = TextEditingController();
-  List<String> _errorMessages = [];
+  TextEditingController _repeatNewPasswordController = TextEditingController();
+
+  List<String> _messages = [];
+
+  void _showDialog(List<String> errorMessages, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children:
+                errorMessages.map((message) => Text('- $message')).toList(),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void updatePassword() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       String value = _newPasswordController.text;
+      String repeatValue = _repeatNewPasswordController.text;
       if (user != null) {
-        if (value.length < 8) {
-          _errorMessages.add('Minimum 8 characters required for password');
+        if (value.length < 8 || repeatValue.length < 8) {
+          _messages.add('Minimum 8 characters required for password');
+          _showDialog(_messages, "Update password error");
+          _messages = [];
         } else if (!RegExp(
-                r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z]).*$')
-            .hasMatch(value)) {
-          _errorMessages.add(
+                    r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z]).*$')
+                .hasMatch(value) ||
+            !RegExp(r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z]).*$')
+                .hasMatch(repeatValue)) {
+          _messages.add(
               'Password must contain at least one digit, one special character, and one uppercase letter');
+          _showDialog(_messages, "Update password error");
+          _messages = [];
+        } else if (value != repeatValue) {
+          _messages.add('Passwords must be the same');
+          _showDialog(_messages, "Update password error");
+          _messages = [];
         } else {
           await user.updatePassword(value);
-          print('Password updated successfully');
+          _messages.add('Password updated successfully');
+          _showDialog(_messages, "Done!");
+          _messages = [];
         }
       } else {
         print('User not logged in');
@@ -119,6 +159,27 @@ class _UpdatePasswordViewState extends State<UpdatePasswordView> {
               padding: EdgeInsets.all(8),
               child: _buildTextField(
                   label: "New password", controller: _newPasswordController),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8, top: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Type new password again:',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: _buildTextField(
+                  label: "New password", controller: _repeatNewPasswordController),
             ),
             SizedBox(height: 8),
             ElevatedButton(

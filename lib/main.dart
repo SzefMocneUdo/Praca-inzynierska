@@ -6,14 +6,13 @@ import 'package:untitled/firebase_options.dart';
 import 'package:untitled/views/AddCreditCardScreen.dart';
 import 'package:untitled/views/BottomMenuView.dart';
 import 'package:untitled/views/CardListView.dart';
-import 'package:untitled/views/ChangePasswordView.dart';
 import 'package:untitled/views/CurrenciesView.dart';
 import 'package:untitled/views/GoalsView.dart';
 import 'package:untitled/views/HelpView.dart';
 import 'package:untitled/views/LoginView.dart';
 import 'package:untitled/views/NotificationsView.dart';
 import 'package:untitled/views/PrivacyAndSecurityView.dart';
-import 'package:untitled/views/ProfileView.dart';
+import 'package:untitled/views/SettingsView.dart';
 import 'package:untitled/views/RegisterView.dart';
 import 'package:untitled/views/TransactionsView.dart';
 import 'package:untitled/views/UpdatePasswordView.dart';
@@ -34,7 +33,6 @@ void main() {
       registerRoute: (context) => RegisterView(),
       verifyEmailRoute: (context) => VerifyEmailView(),
       mainRoute: (context) => MainView(),
-      profileRoute: (context) => ChangePasswordView(),
       transactionsRoute: (context) => Transactions(),
       currenciesRoute: (context) => CurrenciesView(),
       goalsRoute: (context) => GoalsView(),

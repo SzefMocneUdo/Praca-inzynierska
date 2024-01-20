@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:714798005515:android:3066c394b3a4e99141360e',
     messagingSenderId: '714798005515',
     projectId: 'inzynierka-db9e3',
+    databaseURL: 'https://inzynierka-db9e3-default-rtdb.firebaseio.com',
     storageBucket: 'inzynierka-db9e3.appspot.com',
   );
 
@@ -62,6 +63,7 @@ class DefaultFirebaseOptions {
     appId: '1:714798005515:ios:ab68b38f542f261f41360e',
     messagingSenderId: '714798005515',
     projectId: 'inzynierka-db9e3',
+    databaseURL: 'https://inzynierka-db9e3-default-rtdb.firebaseio.com',
     storageBucket: 'inzynierka-db9e3.appspot.com',
     iosBundleId: 'com.example.untitled',
   );

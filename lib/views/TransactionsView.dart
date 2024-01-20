@@ -25,10 +25,10 @@ class _TransactionsState extends State<Transactions> {
   @override
   void initState() {
     super.initState();
-    _fetchExpenses();
+    _fetchTransactions();
   }
 
-  void _fetchExpenses() async {
+  void _fetchTransactions() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 

@@ -303,7 +303,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                   return;
                 }
 
-                // If all validations pass, proceed with adding the card
                 PaymentCard paymentCard = PaymentCard(
                     type: cardType!,
                     number: cardNumberController.text,
@@ -314,7 +313,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                     cvv: cvvController.text,
                 );
 
-                // Save to Firebase
                 try {
                   await FirebaseFirestore.instance.collection('cards').add({
                     'userId': userId,
@@ -325,7 +323,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                     'cvv': paymentCard.cvv,
                   });
 
-                  // Show success dialog
                   Navigator.pop(context);
                 } catch (error) {
                   // Handle errors

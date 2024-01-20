@@ -34,7 +34,8 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _loadExpensesDataLast7Days() async {
-    expensesData = await getExpensesLast7Days(user!.uid.toString());
+    final user = this.user;
+    expensesData = await getExpensesLast7Days(user!);
 
     lineChartSpots = generateSpotsForLast7Days();
 
@@ -116,47 +117,46 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getExpensesLast7Days(String userId) async {
-    final now = DateTime.now();
-    final last7Days = now.subtract(Duration(days: 7));
-
+  Future<List<Map<String, dynamic>>> getExpensesLast7Days(User user) async {
+    final DateTime now = DateTime.now();
+    final DateTime last7DaysStart = now.subtract(Duration(days: 7));
     try {
-      QuerySnapshot currencySnapshot = await FirebaseFirestore.instance
-          .collection('currencies')
-          .where('userId', isEqualTo: userId)
-          .where('currency', isEqualTo: userCurrency)
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('expenses')
+          .where('userId', isEqualTo: user.uid)
+          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(last7DaysStart))
           .get();
 
-      DateTime now = DateTime.now();
-      DateTime last7Days = now.subtract(Duration(days: 7));
+      // Przygotowanie listy wyników
+      List<Map<String, dynamic>> results = [];
 
-      List<Map<String, dynamic>> expensesData = currencySnapshot.docs
-          .where((doc) {
-        DateTime date = (doc['date'] as Timestamp).toDate();
-        return date.isAfter(last7Days);
-      })
-          .map((doc) => {
-        'date': (doc['date'] as Timestamp).toDate(),
-        'amount': doc['amount'],
-      })
-          .toList();
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        DateTime date = (data['date'] as Timestamp).toDate();
+        double amount = data['amount'];
 
-
-      return expensesData;
-
-      //return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        // Dodajemy wynik do listy
+        results.add({
+          'date': date,
+          'amount': amount,
+        });
+        print('Data: $date, Kwota: $amount');
+      }
+      return results;
     } catch (e) {
       print('Error fetching expenses: $e');
       return [];
     }
   }
 
+
+
   List<FlSpot> generateSpotsForLast7Days() {
     List<FlSpot> spots = [];
 
     // Iteruj przez dane i dodawaj punkty do wykresu
     for (int i = 0; i < expensesData.length; i++) {
-      DateTime date = (expensesData[i]['date'] as Timestamp).toDate();
+      DateTime date = expensesData[i]['date'];
       double amount = expensesData[i]['amount'].toDouble();
 
       // Przyjmuję, że 'now' to dzisiaj, a więc biorę różnicę dni między datą wydatku a dzisiaj

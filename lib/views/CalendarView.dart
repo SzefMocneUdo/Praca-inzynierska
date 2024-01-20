@@ -172,7 +172,7 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
           return ListTile(
             title: Text(transaction.name),
             subtitle: Text(transaction is Expense ? 'Expense' : 'Income'),
-            trailing: Text('\$${transaction.amount.toStringAsFixed(2)}'),
+            trailing: Text('${transaction.currency} ${transaction.amount.toStringAsFixed(2)}'),
             onTap: () {
               FinancialItemDetailsDialog(financialItem: transaction)
                   .show(context);

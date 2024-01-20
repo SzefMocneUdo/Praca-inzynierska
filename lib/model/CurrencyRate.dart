@@ -1,12 +1,11 @@
 class CurrencyRate {
   String from;
-  double to;
+  String to;
   String userId;
 
   CurrencyRate({required this.from, required this.to, required this.userId});
 
-  // Converting to Map format for SharedPreferences or Local Storage
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() { //No usages in the project
     return {
       'from': from,
       'to': to,
@@ -14,8 +13,7 @@ class CurrencyRate {
     };
   }
 
-  // Creating CurrencyRate from map
-  factory CurrencyRate.fromMap(Map<String, dynamic> map) {
+  factory CurrencyRate.fromMap(Map<String, dynamic> map) { //No usages in the project
     return CurrencyRate(
       from: map['from'],
       to: map['to'],

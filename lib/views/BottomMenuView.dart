@@ -90,7 +90,7 @@ class _MainViewState extends State<MainView> {
             children: [
               ListTile(
                 leading: Icon(Icons.money_off),
-                title: Text('Add new outcome'),
+                title: Text('Add a new expense'),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -101,7 +101,7 @@ class _MainViewState extends State<MainView> {
               ),
               ListTile(
                 leading: Icon(Icons.attach_money),
-                title: Text('Add new income'),
+                title: Text('Add an new income'),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -112,7 +112,7 @@ class _MainViewState extends State<MainView> {
               ),
               ListTile(
                 leading: Icon(Icons.credit_card),
-                title: Text('Attach new credit card'),
+                title: Text('Attach a new credit card'),
                 onTap: () async {
                   Navigator.pop(context);
                   await Navigator.push(
@@ -125,7 +125,7 @@ class _MainViewState extends State<MainView> {
               ),
               ListTile(
                 leading: Icon(Icons.flag),
-                title: Text('Add new saving goal'),
+                title: Text('Add a new saving goal'),
                 onTap: () async {
                   Navigator.pop(context);
                   // Przejdź do ekranu dodawania celu

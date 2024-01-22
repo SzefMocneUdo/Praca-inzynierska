@@ -67,7 +67,7 @@ class _SettingsViewState extends State<SettingsView> {
             if (username != null && username!.isNotEmpty)
               Center(
                 child: Text(
-                  'Welcome, $username!', // Wyświetl powitanie z nazwą użytkownika
+                  'Welcome, $username!',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
                 ),
               ),
@@ -95,13 +95,14 @@ class _SettingsViewState extends State<SettingsView> {
               );
             }),
             buildOption(context, "2FA Verification", () {
-              // Dodaj logikę dwuetapowej weryfikacji
             }),
             SizedBox(height: 20),
             // "Features" section
             buildSectionTitle("Features"),
             buildOption(context, "Calendar", () {
-              Navigator.pushNamed(context, calendarRoute);
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => FaqView()),
+              );
             }),
             buildOption(context, "Cards", () {
               Navigator.pushNamed(context, cardsRoute);
@@ -116,22 +117,18 @@ class _SettingsViewState extends State<SettingsView> {
               );
             }),
             buildOption(context, "Contact", () {
-              // Dodaj logikę kontaktu
             }),
             SizedBox(height: 20),
             // "Accessibility" section
             buildSectionTitle("Accessibility"),
             buildOption(context, "Display Mode", () {
-              // Dodaj logikę zmiany trybu wyświetlania
             }),
             SizedBox(height: 20),
             // "Account Management" section
             buildSectionTitle("Account Management"),
             buildOption(context, "Hibernate Account", () {
-              // Dodaj logikę hibernacji konta
             }),
             buildOption(context, "Close Account", () {
-              // Dodaj logikę zamknięcia konta
             }),
             SizedBox(height: 20),
             // Logout option
@@ -176,7 +173,6 @@ class _SettingsViewState extends State<SettingsView> {
       onTap: () async {
         bool confirmLogout = await showLogOutDialog(context);
         if (confirmLogout) {
-          // Implement logout functionality here
           FirebaseAuth.instance.signOut();
           Navigator.pushAndRemoveUntil(
             context,
@@ -194,7 +190,7 @@ class _SettingsViewState extends State<SettingsView> {
               children: [
                 Icon(
                   Icons.exit_to_app,
-                  color: Colors.red, // Customize the color as needed
+                  color: Colors.red,
                 ),
                 SizedBox(width: 10),
                 Text(
@@ -223,8 +219,7 @@ class _SettingsViewState extends State<SettingsView> {
                 Navigator.of(context).pop(false);
               },
               child: const Text('Cancel'),
-            ),
-            TextButton(
+            ), TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },

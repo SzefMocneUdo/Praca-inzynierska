@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -24,6 +25,10 @@ class _HomeViewState extends State<HomeView> {
   String userCurrency = "";
   List<Map<String, dynamic>> expensesData = [];
   List<FlSpot> lineChartSpots = [];
+  List<BarChartGroupData> barGroups = [];
+  List<String> currencies = [];
+  int _currentCarouselPage = 0;
+  final CarouselController _carouselController = CarouselController();
 
   @override
   void initState() {
@@ -31,6 +36,129 @@ class _HomeViewState extends State<HomeView> {
     _fetchRecentExpenses();
     _getUserCurrency();
     _loadExpensesDataLast7Days();
+    _loadExpensesDataByCurrency();
+  }
+
+  void _loadExpensesDataByCurrency() async {
+    final user = this.user;
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('expenses')
+          .where('userId', isEqualTo: user?.uid)
+          .get();
+
+      List<ExpenseData> expensesByCurrency = prepareExpenseData(querySnapshot);
+
+      currencies = expensesByCurrency
+          .map((expense) => expense.currency)
+          .toSet()
+          .toList();
+
+      barGroups = generateBarGroups(expensesByCurrency);
+
+      setState(() {});
+    } catch (e) {
+      print('Error fetching expenses by currency: $e');
+    }
+  }
+
+  List<BarChartGroupData> generateBarGroups(List<ExpenseData> expenses) {
+    List<BarChartGroupData> groups = [];
+
+    // Map to store the sum of expenses for each currency
+    Map<String, double> currencySumMap = {};
+
+    // Iterate through expenses to calculate the sum for each currency
+    for (int i = 0; i < expenses.length; i++) {
+      String currency = expenses[i].currency;
+      double amount = expenses[i].amount;
+
+      currencySumMap[currency] = (currencySumMap[currency] ?? 0.0) + amount;
+    }
+
+    // Iterate through currencies and create BarChartGroupData
+    for (int i = 0; i < currencies.length; i++) {
+      String currency = currencies[i];
+
+      List<BarChartRodData> rods = [];
+      double sum = currencySumMap[currency] ?? 0.0;
+
+      rods.add(BarChartRodData(
+        y: sum,
+        width: 16,
+      ));
+
+      groups.add(BarChartGroupData(
+        x: i,
+        barRods: rods,
+        showingTooltipIndicators: [0],
+      ));
+    }
+
+    return groups;
+  }
+
+
+  Widget _buildBarChart() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 50.0),
+          child: Text(
+            'Expenses in different currencies',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: AspectRatio(
+            aspectRatio: 1.5,
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                groupsSpace: 12,
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipBgColor: Colors.blueAccent,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        rod.y.round().toString(),
+                        TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: SideTitles(showTitles: false),
+                  topTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                  bottomTitles: SideTitles(
+                    showTitles: true,
+                    getTitles: (value) {
+                      if (value.toInt() < currencies.length) {
+                        return currencies[value.toInt()];
+                      }
+                      return '';
+                    },
+                    margin: 10,
+                  ),
+                ),
+                borderData: FlBorderData(
+                  show: false,
+                ),
+                barGroups: barGroups,
+              ),
+            ),
+          ),
+        ))
+      ],
+    );
   }
 
   void _loadExpensesDataLast7Days() async {
@@ -39,37 +167,27 @@ class _HomeViewState extends State<HomeView> {
 
     lineChartSpots = generateSpotsForLast7Days();
 
-    for (var expenseMap in expensesData) {
-      print("Expense data:");
-      expenseMap.forEach((key, value) {
-        print("$key: $value");
-      });
-      print("--------------");
-    }
     setState(() {}); // Aktualizacja interfejsu użytkownika po pobraniu danych
   }
-
 
   void _getUserCurrency() async {
     try {
       final user = this.user;
       if (user != null) {
         FirebaseFirestore firestore = FirebaseFirestore.instance;
-        QuerySnapshot querySnapshot = await firestore
-            .collection('users')
-            .where('email', isEqualTo: user.email)
-            .get();
+        DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+            await firestore.collection('users').doc(user.uid).get();
 
-        if (querySnapshot.docs.isNotEmpty) {
-          userCurrency = querySnapshot.docs.first.get('currency');
+        if (documentSnapshot.exists) {
+          userCurrency = documentSnapshot.get('currency');
 
           if (userCurrency != "") {
-            print('Wartość pola "currency" to: $userCurrency');
+            print('Value of "currency" field: $userCurrency');
           } else {
-            print('Pole "currency" nie ma wartości lub jest null.');
+            print('"currency" field is empty or equals null.');
           }
         } else {
-          print('Brak dokumentu dla podanego adresu e-mail.');
+          print('Document does not exist');
         }
       }
     } catch (e) {
@@ -94,21 +212,21 @@ class _HomeViewState extends State<HomeView> {
             recentExpenses = List.empty();
             hasExpenses = false;
           });
-        }
-          else {
+        } else {
           setState(() {
             recentExpenses = prepareExpenseData(querySnapshot);
             hasExpenses = true;
 
             for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-              Map<String, dynamic> expenseData = doc.data() as Map<String, dynamic>;
+              Map<String, dynamic> expenseData =
+                  doc.data() as Map<String, dynamic>;
 
-              if (expenseData.containsKey('currency') && expenseData['currency'] == userCurrency) {
+              if (expenseData.containsKey('currency') &&
+                  expenseData['currency'] == userCurrency) {
                 hasExpenseWithUserCurrency = true;
                 break;
               }
             }
-
           });
         }
       }
@@ -120,28 +238,31 @@ class _HomeViewState extends State<HomeView> {
   Future<List<Map<String, dynamic>>> getExpensesLast7Days(User user) async {
     final DateTime now = DateTime.now();
     final DateTime last7DaysStart = now.subtract(Duration(days: 7));
+
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('expenses')
           .where('userId', isEqualTo: user.uid)
-          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(last7DaysStart))
+          .where('date',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(last7DaysStart))
           .get();
 
-      // Przygotowanie listy wyników
       List<Map<String, dynamic>> results = [];
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> expenseData = doc.data() as Map<String, dynamic>;
+        String currency = expenseData['currency'] ?? '';
 
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        DateTime date = (data['date'] as Timestamp).toDate();
-        double amount = data['amount'];
+        if (currency == userCurrency) {
+          DateTime date = (expenseData['date'] as Timestamp).toDate();
+          double amount = expenseData['amount'].toDouble();
 
-        // Dodajemy wynik do listy
-        results.add({
-          'date': date,
-          'amount': amount,
-        });
-        print('Data: $date, Kwota: $amount');
+          results.add({
+            'date': date,
+            'amount': amount,
+          });
+        }
       }
+
       return results;
     } catch (e) {
       print('Error fetching expenses: $e');
@@ -149,12 +270,12 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-
-
   List<FlSpot> generateSpotsForLast7Days() {
-    List<FlSpot> spots = [];
+    // Inicjalizacja punktów dla każdego dnia z ostatnich 7 dni
+    List<FlSpot> spots =
+        List.generate(7, (index) => FlSpot(index.toDouble(), 0));
 
-    // Iteruj przez dane i dodawaj punkty do wykresu
+    // Iteracja po danych wydatków i aktualizacja punktów
     for (int i = 0; i < expensesData.length; i++) {
       DateTime date = expensesData[i]['date'];
       double amount = expensesData[i]['amount'].toDouble();
@@ -162,9 +283,12 @@ class _HomeViewState extends State<HomeView> {
       // Przyjmuję, że 'now' to dzisiaj, a więc biorę różnicę dni między datą wydatku a dzisiaj
       int daysAgo = DateTime.now().difference(date).inDays;
 
-      // Dodaj punkt do wykresu
-      spots.add(FlSpot(daysAgo.toDouble(), amount));
+      // Aktualizacja punktu na wykresie
+      spots[daysAgo] = FlSpot(daysAgo.toDouble(), amount);
     }
+
+    print("Spots: ");
+    print(spots);
 
     return spots;
   }
@@ -185,63 +309,152 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body:
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child:
-              Column(
-                children: [
-                  hasExpenses ? _buildChartSet() : _buildWelcomeMessage(),
-                  hasExpenses ? _buildLatestExpensesList() : _buildWelcomeMessage(),
-                ],
-              )
-            ),
+      body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            children: [
+              hasExpenses ? _buildCarousel() : _buildWelcomeMessage(),
+              _buildCarouselIndicators(),
+              hasExpenses
+                  ? _buildLatestExpensesList() : _buildWelcomeMessageList(),
+            ],
+          )),
     );
   }
 
-  Widget _buildCard(Widget widget) => Container(
-    width: MediaQuery. of(context). size. width,
-    height: 200,
-    child: widget,
-  );
+  Widget _buildCard(Widget widget, EdgeInsetsGeometry margin) => Container(
+        margin: margin,
+        width: MediaQuery.of(context).size.width,
+        height: 200,
+        child: widget,
+      );
 
-  Widget _buildChartSet() {
-    return Container(
-      height: 350,
-      child: PageView(
-      scrollDirection: Axis.horizontal,
-      children: [
-        _buildCard(_buildPieChart()),
-        _buildCard(_buildLineChart()),
-        _buildCard(_buildPieChart()),
-      ],
-    ),
-    );
-  }
-
-  LineChart _buildLineChart() {
-    return LineChart(
-      LineChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(show: false),
-        minX: 0,
-        maxX: 7,
-        minY: 0,
-        maxY: 200,
-        lineBarsData: [
-          LineChartBarData(
-            spots: lineChartSpots,
-            isCurved: true,
-            colors: [Colors.blue],
-            dotData: FlDotData(show: false),
-            belowBarData: BarAreaData(show: false),
-          ),
-        ],
+  Widget _buildCarousel(){
+    return CarouselSlider(
+      carouselController: _carouselController,
+      items: [_buildPieChart(), _buildLineChart(), _buildBarChart()],
+      options: CarouselOptions(
+        height: 300,
+        initialPage: 0,
+        enableInfiniteScroll: false,
+        enlargeCenterPage: true,
+        autoPlay: false,
+        aspectRatio: 2.0,
+        onPageChanged: (index, reason) {
+          setState(() {
+            _currentCarouselPage = index;
+          });
+        },
       ),
     );
   }
 
+  Widget _buildCarouselIndicators() {
+    List<Widget> indicators = [];
+    for (int i = 0; i < 3; i++) {
+      indicators.add(Container(
+        width: 8.0,
+        height: 8.0,
+        margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _currentCarouselPage == i ? Colors.blue : Colors.grey,
+        ),
+      ));
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: indicators,
+    );
+  }
 
+
+  Widget _buildLineChart() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 30.0),
+          child: Text(
+            'Expenses in last 7 days ($userCurrency)',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: true,
+                drawHorizontalLine: true,
+              ),
+              titlesData: FlTitlesData(
+                show: true,
+                topTitles: SideTitles(
+                  showTitles: false,
+                ),
+                bottomTitles: SideTitles(
+                  showTitles: true,
+                  getTitles: (value) {
+                    DateTime date =
+                        DateTime.now().subtract(Duration(days: value.toInt()));
+                    return '${date.day}/${date.month}';
+                  },
+                  margin: 8,
+                  reservedSize: 30,
+                  interval: 1,
+                ),
+                leftTitles: SideTitles(
+                  showTitles: false,
+                  getTitles: (value) {
+                    return value.toString();
+                  },
+                ),
+              ),
+              minY: 0,
+              lineBarsData: [
+                LineChartBarData(
+                  spots: lineChartSpots.isNotEmpty
+                      ? lineChartSpots
+                      : [FlSpot(0, 0)],
+                  isCurved: false,
+                  colors: [Colors.blue],
+                  dotData: FlDotData(show: true),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    colors: [
+                      Colors.blue.withOpacity(0.2),
+                      Colors.blue.withOpacity(0.1)
+                    ],
+                    gradientColorStops: [0.0, 0.5],
+                  ),
+                ),
+              ],
+              borderData: FlBorderData(
+                show: true,
+                border: Border.all(color: Colors.black, width: 1),
+              ),
+            ),
+          ),
+        ),
+        _buildLegendLineChart(),
+      ],
+    );
+  }
+
+  Widget _buildLegendLineChart() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          margin: EdgeInsets.all(5),
+          color: Colors.blue,
+          width: 20,
+          height: 20,
+        ),
+        Text('Expenses in last 7 days'),
+      ],
+    );
+  }
 
   Widget _buildPieChart() {
     return Column(
@@ -250,7 +463,7 @@ class _HomeViewState extends State<HomeView> {
         Padding(
           padding: const EdgeInsets.only(bottom: 30.0),
           child: Text(
-            'Graph of expenses in main currency',
+            'Graph of all expenses ($userCurrency)',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
@@ -386,6 +599,16 @@ class _HomeViewState extends State<HomeView> {
     return Center(
       child: Text(
         'Welcome to the app!\nCreate new outcome to see a chart.',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeMessageList() {
+    return Center(
+      child: Text(
+        'Create new outcome to see a list.',
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 18),
       ),

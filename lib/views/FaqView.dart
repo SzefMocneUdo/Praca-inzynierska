@@ -49,7 +49,8 @@ class _FaqViewState extends State<FaqView> {
               return ExpansionPanel(
                 headerBuilder: (BuildContext context, bool isExpanded) {
                   return ListTile(
-                    title: Text(item.headerValue, style: TextStyle(fontWeight: FontWeight.bold),),
+                    title: Text(item.headerValue,
+                      style: TextStyle(fontWeight: FontWeight.bold),),
                   );
                 },
                 body: ListTile(
@@ -89,18 +90,18 @@ List<Item> generateItems() {
   items.add(Item(
     headerValue: 'How to add a new expense?',
     expandedValue: 'To add a new expense You need to hold "+" button placed on the navigation bar for 2 seconds.'
-        'From the displayed menu select "Add a new outcome". Fill all of the required fields and press "Add Expense" button.',
+        'From the displayed menu select "Add a new expense". Fill all of the required fields and press "Add Expense" button.',
   ));
 
   items.add(Item(
-    headerValue: 'How to add a new income?',
+    headerValue: 'How to add an new income?',
     expandedValue: 'To add a new income You need to hold "+" button placed on the navigation bar for 2 seconds.'
-        'From the displayed menu select "Add a new income". Fill all of the required fields and press "Add Income" button.',
+        'From the displayed menu select "Add an new income". Fill all of the required fields and press "Add Income" button.',
   ));
 
   items.add(Item(
     headerValue: 'How to attach a new credit card?',
-    expandedValue: 'To attach new credit card You need to hold "+" button placed on the navigation bar for 2 seconds.'
+    expandedValue: 'To attach a new credit card You need to hold "+" button placed on the navigation bar for 2 seconds.'
         'From the displayed menu select "Attach a new credit card". Fill all of the required fields and press "Add" button.'
         'You can also select card style and turn it to the other side.',
   ));

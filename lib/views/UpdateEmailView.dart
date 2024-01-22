@@ -79,13 +79,14 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
           if (isAvailable) {
             bool isPasswordCorrect = await verifyCurrentPassword(_passwordController.text);
             if(isPasswordCorrect){
-              await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(
+              await FirebaseAuth.instance.currentUser!
+                  .reauthenticateWithCredential(
                 EmailAuthProvider.credential(
                   email: FirebaseAuth.instance.currentUser!.email!,
                   password: _passwordController.text,
                 ),
               );
-              await user?.updateEmail(_newEmailController.text);
+              await user.updateEmail(_newEmailController.text);
               _messages.add('E-mail updated successfully');
               _showDialog(_messages, "Done!");
               _messages = [];

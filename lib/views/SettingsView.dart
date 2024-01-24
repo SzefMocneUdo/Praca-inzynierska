@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
 import 'package:untitled/main.dart';
+import 'package:untitled/views/ContactUsView.dart';
 import 'package:untitled/views/FaqView.dart';
 import 'package:untitled/views/NotificationsView.dart';
 import 'package:untitled/views/UpdateEmailView.dart';
@@ -116,11 +117,16 @@ class _SettingsViewState extends State<SettingsView> {
                 MaterialPageRoute(builder: (context) => FaqView()),
               );
             }),
-            buildOption(context, "Contact", () {}),
+            buildOption(context, "Contact Us", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ContactUsView()),
+              );
+            }),
             SizedBox(height: 20),
             SizedBox(height: 20),
             buildSectionTitle("Account Management"),
-            buildOption(context, "Close Account", () {}),
+            buildDeleteAccountOption(context),
             SizedBox(height: 20),
             buildLogoutOption(context),
           ],
@@ -203,6 +209,47 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
+  GestureDetector buildDeleteAccountOption(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        bool confirmLogout = await showDeleteAccountDialog(context);
+        if (confirmLogout) {
+          FirebaseAuth.instance.signOut();
+          FirebaseAuth.instance.currentUser?.delete();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+            (route) => false,
+          );
+        }
+      },
+      child: const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.delete_forever,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  "Delete Account",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<bool> showLogOutDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -222,6 +269,32 @@ class _SettingsViewState extends State<SettingsView> {
                 Navigator.of(context).pop(true);
               },
               child: const Text('Log out'),
+            )
+          ],
+        );
+      },
+    ).then((value) => value ?? false);
+  }
+
+  Future<bool> showDeleteAccountDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: const Text('Are You sure that You want to delete your account?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Delete', style: TextStyle(color: (Colors.red)),),
             )
           ],
         );

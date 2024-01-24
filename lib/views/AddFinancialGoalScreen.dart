@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../model/Currency.dart';
+import 'NotificationsView.dart';
 
 class AddFinancialGoalScreen extends StatefulWidget {
   @override
@@ -115,6 +116,25 @@ class _AddFinancialGoalScreenState extends State<AddFinancialGoalScreen> {
       appBar: AppBar(
         title: Text('Add Financial Goal'),
         backgroundColor: Colors.blueAccent,
+        leading: GestureDetector(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NotificationsView(),
+              ));
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

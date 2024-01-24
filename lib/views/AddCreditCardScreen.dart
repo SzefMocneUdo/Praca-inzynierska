@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../model/PaymentCard.dart';
+import 'NotificationsView.dart';
 import 'card_components/CardStylePicker.dart';
 import 'card_components/CardStyles.dart';
 import 'card_components/CardUtilis.dart';
@@ -90,6 +91,25 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.blueAccent,
+        leading: GestureDetector(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NotificationsView(),
+              ));
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -14,16 +14,6 @@ class _NotificationsViewState extends State<NotificationsView> {
       appBar: AppBar(
         title: const Text('Notifications'),
         backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => NotificationsView(),
-              ));
-            },
-          )
-        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../model/PaymentCard.dart';
+import 'NotificationsView.dart';
 import 'card_components/CardStyles.dart';
 import 'card_components/CardUtilis.dart';
 
@@ -35,6 +36,26 @@ class _CardListViewState extends State<CardListView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Your Credit Cards"),
+        backgroundColor: Colors.blueAccent,
+        leading: GestureDetector(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NotificationsView(),
+              ));
+            },
+          )
+        ],
       ),
       body: FutureBuilder<List<PaymentCard>>(
         future: _creditCardsFuture,

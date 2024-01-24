@@ -94,8 +94,6 @@ class _SettingsViewState extends State<SettingsView> {
                 MaterialPageRoute(builder: (context) => UpdateEmailView()),
               );
             }),
-            buildOption(context, "2FA Verification", () {
-            }),
             SizedBox(height: 20),
             // "Features" section
             buildSectionTitle("Features"),
@@ -119,15 +117,9 @@ class _SettingsViewState extends State<SettingsView> {
             buildOption(context, "Contact", () {
             }),
             SizedBox(height: 20),
-            // "Accessibility" section
-            buildSectionTitle("Accessibility"),
-            buildOption(context, "Display Mode", () {
-            }),
             SizedBox(height: 20),
             // "Account Management" section
             buildSectionTitle("Account Management"),
-            buildOption(context, "Hibernate Account", () {
-            }),
             buildOption(context, "Close Account", () {
             }),
             SizedBox(height: 20),

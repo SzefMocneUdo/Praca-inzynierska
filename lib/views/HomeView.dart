@@ -314,9 +314,8 @@ class _HomeViewState extends State<HomeView> {
           child: Column(
             children: [
               hasExpenses ? _buildCarousel() : _buildWelcomeMessage(),
-              _buildCarouselIndicators(),
-              hasExpenses
-                  ? _buildLatestExpensesList() : _buildWelcomeMessageList(),
+              if(hasExpenses) _buildCarouselIndicators(),
+              if(hasExpenses)  _buildLatestExpensesList()
             ],
           )),
     );
@@ -599,16 +598,6 @@ class _HomeViewState extends State<HomeView> {
     return Center(
       child: Text(
         'Welcome to the app!\nCreate new outcome to see a chart.',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 18),
-      ),
-    );
-  }
-
-  Widget _buildWelcomeMessageList() {
-    return Center(
-      child: Text(
-        'Create new outcome to see a list.',
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 18),
       ),

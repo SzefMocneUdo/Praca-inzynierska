@@ -3,6 +3,5 @@ class ExpenseData {
   double amount;
   String currency;
 
-  // ExpenseData(this.category, this.amount);
   ExpenseData(this.category, this.amount, this.currency);
 }

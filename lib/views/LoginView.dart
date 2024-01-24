@@ -1,9 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
-// ignore_for_file: use_build_context_synchronously
-
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/constants/routes.dart';
@@ -74,7 +68,9 @@ class _LoginViewState extends State<LoginView> {
       child: TextField(
         controller: controller,
         enableSuggestions: false,
-        keyboardType: isPassword ? TextInputType.visiblePassword : TextInputType.emailAddress,
+        keyboardType: isPassword
+            ? TextInputType.visiblePassword
+            : TextInputType.emailAddress,
         autocorrect: false,
         obscureText: isPassword && _obscurePassword,
         decoration: InputDecoration(
@@ -82,16 +78,16 @@ class _LoginViewState extends State<LoginView> {
           prefixIcon: Icon(iconData, color: iconColor),
           suffixIcon: isPassword
               ? IconButton(
-            icon: Icon(
-              _obscurePassword ? Icons.visibility : Icons.visibility_off,
-              color: Colors.grey,
-            ),
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
-          )
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                )
               : null,
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25.0),
@@ -130,7 +126,7 @@ class _LoginViewState extends State<LoginView> {
         return AlertDialog(
           title: Text('Verification Email Sent'),
           content:
-          Text('A verification email has been sent. Check your inbox.'),
+              Text('A verification email has been sent. Check your inbox.'),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -172,7 +168,7 @@ class _LoginViewState extends State<LoginView> {
                 isPassword: false,
                 iconData: Icons.email,
                 validator: (value) {
-                  return null; // Add your validation logic here
+                  return null;
                 },
                 borderColor: emailBorderColor,
                 iconColor: emailIconColor,
@@ -184,7 +180,7 @@ class _LoginViewState extends State<LoginView> {
                 isPassword: true,
                 iconData: Icons.lock,
                 validator: (value) {
-                  return null; // Add your validation logic here
+                  return null;
                 },
                 borderColor: passwordBorderColor,
                 iconColor: passwordIconColor,
@@ -195,21 +191,26 @@ class _LoginViewState extends State<LoginView> {
                   final email = _email.text;
                   final password = _password.text;
                   try {
-                    final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+                    final userCredential = await FirebaseAuth.instance
+                        .signInWithEmailAndPassword(
+                            email: email, password: password);
                     if (userCredential.user?.emailVerified ?? false) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil(mainRoute, (route) => false);
                     } else {
                       showDialog(
                         context: context,
                         builder: (context) {
                           return AlertDialog(
                             title: Text('Account not verified'),
-                            content: Text('Please verify your email before logging in.'),
+                            content: Text(
+                                'Please verify your email before logging in.'),
                             actions: [
                               Center(
                                 child: TextButton(
                                   onPressed: () async {
-                                    await userCredential.user?.sendEmailVerification();
+                                    await userCredential.user
+                                        ?.sendEmailVerification();
                                     _showEmailSentDialog();
                                   },
                                   child: Text('Send verification email'),
@@ -229,7 +230,8 @@ class _LoginViewState extends State<LoginView> {
               SizedBox(height: 10.0),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(registerRoute, (route) => false);
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil(registerRoute, (route) => false);
                 },
                 child: const Text('Not registered yet? Register here!'),
               ),

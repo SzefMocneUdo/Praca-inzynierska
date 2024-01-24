@@ -65,7 +65,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     setState(() {
                       _selectedDate = pickedDate;
                       _dateController.text =
-                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },
@@ -166,7 +166,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       controller: _currencyTextField,
       readOnly: true,
       decoration: InputDecoration(
-        hintText: _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
+        hintText:
+            _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
         prefixIcon: Icon(
           Icons.attach_money,
           color: Colors.grey,

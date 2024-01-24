@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'CurrenciesView.dart';
-
 
 class FollowExchangeRatesScreen extends StatefulWidget {
   const FollowExchangeRatesScreen({Key? key}) : super(key: key);
@@ -23,7 +21,6 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   late TextEditingController _fromCurrencyTextField;
   late TextEditingController _toCurrencyTextField;
 
-
   @override
   void initState() {
     super.initState();
@@ -39,11 +36,10 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
       showCurrencyCode: true,
       onSelect: (Currency currency) {
         setState(() {
-          if(isFrom){
+          if (isFrom) {
             _fromController = currency;
             _fromCurrencyTextField.text = currency.name;
-          }
-          else{
+          } else {
             _toController = currency;
             _toCurrencyTextField.text = currency.name;
           }
@@ -53,12 +49,13 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
   }
 
   Widget _buildCurrencyPickerTextField(bool isFrom) {
-    if(isFrom){
+    if (isFrom) {
       return TextFormField(
         controller: _fromCurrencyTextField,
         readOnly: true,
         decoration: InputDecoration(
-          hintText: _fromController != null ? _fromController!.name : 'Currency',
+          hintText:
+              _fromController != null ? _fromController!.name : 'Currency',
           prefixIcon: Icon(
             Icons.attach_money,
             color: Colors.grey,
@@ -83,8 +80,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
         ),
         style: TextStyle(color: Colors.black),
       );
-    }
-    else{
+    } else {
       return TextFormField(
         controller: _toCurrencyTextField,
         readOnly: true,
@@ -121,7 +117,7 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
       FirebaseFirestore firestore, String fromValue, String toValue) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if(user != null){
+      if (user != null) {
         QuerySnapshot querySnapshot = await firestore
             .collection('followedCurrencies')
             .where('from', isEqualTo: fromValue)
@@ -130,18 +126,15 @@ class _FollowExchangeRatesScreenState extends State<FollowExchangeRatesScreen> {
             .get();
 
         return querySnapshot.docs.isNotEmpty;
-      }
-      else{
+      } else {
         print("User does not exist");
         return false;
       }
-
     } catch (e) {
       print('Wystąpił błąd: $e');
       throw e;
     }
   }
-
 
   void _addCurrencies() async {
     try {

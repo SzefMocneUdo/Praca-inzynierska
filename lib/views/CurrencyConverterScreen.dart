@@ -1,9 +1,6 @@
-import 'dart:ffi';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:live_currency_rate/live_currency_rate.dart';
 import 'package:currency_picker/currency_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:live_currency_rate/live_currency_rate.dart';
 
 import 'CurrenciesView.dart';
 
@@ -226,23 +223,21 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                   String amountText = _amountController.text;
                   double amount = double.tryParse(amountText) ?? 0.0;
 
-                  if (_fromController == null || _toController == null ) {
+                  if (_fromController == null || _toController == null) {
                     setState(() {
                       errorMessage = "Currency is required";
                     });
                     showErrorDialog(context, 'Error', errorMessage);
                     return;
-                  }
-                  else if(amount == 0.0){
+                  } else if (amount == 0.0) {
                     setState(() {
                       errorMessage = "Amount is required";
                     });
                     showErrorDialog(context, 'Error', errorMessage);
                     return;
-                  }
-                  else{
-                    String fromCode = _fromController!.code ?? "";
-                    String toCode = _toController!.code ?? "";
+                  } else {
+                    String fromCode = _fromController!.code;
+                    String toCode = _toController!.code;
 
                     CurrencyRate rate = await LiveCurrencyRate.convertCurrency(
                         fromCode, toCode, amount);
@@ -252,8 +247,6 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                       _resultController = rate.result;
                     });
                   }
-
-
                 },
                 child: Text(
                   'Convert',

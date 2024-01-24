@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'CardStyles.dart';
@@ -27,7 +26,7 @@ class _CardStylePickerState extends State<CardStylePicker> {
               title: Text('Select Card Style'),
               content: Container(
                 width: double.maxFinite,
-                height: 200.0, // Adjust the height as needed
+                height: 200.0,
                 child: ListView(
                   children: [
                     ListTile(
@@ -36,7 +35,7 @@ class _CardStylePickerState extends State<CardStylePicker> {
                           CircleAvatar(
                             backgroundColor: selectedCardStyle == CardStyles.red
                                 ? Colors.red
-                                : Colors.red, // lub dowolny inny kolor dla innych styli
+                                : Colors.red,
                             radius: 12.0,
                           ),
                           SizedBox(width: 10.0),
@@ -51,7 +50,6 @@ class _CardStylePickerState extends State<CardStylePicker> {
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -60,7 +58,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.blueGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.blueGradient)
                                     ? CardStyles.blueGradient
                                     : CardStyles.blueGradient,
                               ),
@@ -72,13 +72,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.blueGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.blueGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -87,7 +87,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.orangeGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.orangeGradient)
                                     ? CardStyles.orangeGradient
                                     : CardStyles.orangeGradient,
                               ),
@@ -99,13 +101,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.orangeGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.orangeGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -114,7 +116,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.purpleGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.purpleGradient)
                                     ? CardStyles.purpleGradient
                                     : CardStyles.purpleGradient,
                               ),
@@ -126,13 +130,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.purpleGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.purpleGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -141,7 +145,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.greenGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.greenGradient)
                                     ? CardStyles.greenGradient
                                     : CardStyles.greenGradient,
                               ),
@@ -153,13 +159,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.greenGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.greenGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -168,7 +174,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.yellowGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.yellowGradient)
                                     ? CardStyles.yellowGradient
                                     : CardStyles.yellowGradient,
                               ),
@@ -180,13 +188,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.yellowGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.yellowGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -195,7 +203,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.limeGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.limeGradient)
                                     ? CardStyles.limeGradient
                                     : CardStyles.limeGradient,
                               ),
@@ -207,13 +217,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.limeGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.limeGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                     ListTile(
                       title: Row(
                         children: [
@@ -222,7 +232,9 @@ class _CardStylePickerState extends State<CardStylePicker> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: selectedCardStyle == CardStyles.customGradient(CardStyles.greyGradient)
+                                gradient: selectedCardStyle ==
+                                        CardStyles.customGradient(
+                                            CardStyles.greyGradient)
                                     ? CardStyles.greyGradient
                                     : CardStyles.greyGradient,
                               ),
@@ -234,13 +246,13 @@ class _CardStylePickerState extends State<CardStylePicker> {
                       ),
                       onTap: () {
                         setState(() {
-                          selectedCardStyle = CardStyles.customGradient(CardStyles.greyGradient);
+                          selectedCardStyle = CardStyles.customGradient(
+                              CardStyles.greyGradient);
                         });
                         Navigator.pop(context);
                         widget.onStyleSelected(selectedCardStyle);
                       },
                     ),
-
                   ],
                 ),
               ),
@@ -251,5 +263,4 @@ class _CardStylePickerState extends State<CardStylePicker> {
       child: Text('Select Card Style'),
     );
   }
-
 }

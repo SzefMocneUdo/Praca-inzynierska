@@ -17,11 +17,14 @@ class _PrivacyAndSecurityViewState extends State<PrivacyAndSecurityView> {
         title: const Text('Privacy and Security'),
         backgroundColor: Colors.blueAccent,
         leading: GestureDetector(
-          child: Icon( Icons.arrow_back_ios, color: Colors.black,  ),
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
           onTap: () {
             Navigator.pop(context);
-          } ,
-        ) ,
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -36,4 +39,3 @@ class _PrivacyAndSecurityViewState extends State<PrivacyAndSecurityView> {
     );
   }
 }
-

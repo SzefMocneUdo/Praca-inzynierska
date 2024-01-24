@@ -9,9 +9,8 @@ const goalsRoute = '/goals/';
 const notificationsRoute = '/notifications/';
 const settingsRoute = '/settings/';
 const privacyAndSecurityRoute = '/privacy-and-security/';
-const helpRoute = '/help/';
+const faqRoute = '/faq/';
 const updatePasswordRoute = '/update-password-route/';
 const creditCard = '/addingCard/';
 const String cardsRoute = "/cards/";
 const String calendarRoute = "/calendar/";
-

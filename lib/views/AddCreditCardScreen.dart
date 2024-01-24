@@ -4,10 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'card_components/CardStyles.dart';
-import 'card_components/InputFormatters.dart';
+import '../model/PaymentCard.dart';
 import 'card_components/CardStylePicker.dart';
+import 'card_components/CardStyles.dart';
 import 'card_components/CardUtilis.dart';
+import 'card_components/InputFormatters.dart';
 
 class AddCreditCardScreen extends StatefulWidget {
   @override
@@ -30,7 +31,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   Widget? selectedCardStyle;
-
 
   @override
   void initState() {
@@ -89,7 +89,7 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
           "New Card",
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.blueAccent, // Set the background color to blue
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -121,7 +121,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
             ),
             const SizedBox(height: 20.0),
             SizedBox(height: 20.0),
-            // Card Style Picker
             CardStylePicker(
               onStyleSelected: (selectedStyle) {
                 setState(() {
@@ -253,48 +252,39 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () async {
-                // Validate card number
                 String? cardNumValidation =
-                CardUtils.validateCardNum(cardNumberController.text);
+                    CardUtils.validateCardNum(cardNumberController.text);
 
                 if (cardNumValidation != null) {
-                  // Handle invalid card number
                   showErrorDialog(context, 'Error', cardNumValidation);
                   return;
                 }
 
-                // Validate CVV
                 String? cvvValidation =
-                CardUtils.validateCVV(cvvController.text);
+                    CardUtils.validateCVV(cvvController.text);
 
                 if (cvvValidation != null) {
-                  // Handle invalid CVV
                   showErrorDialog(context, 'Error', cvvValidation);
                   return;
                 }
 
-                // Validate expiry date
                 String? dateValidation =
-                CardUtils.validateDate(expiryDateController.text);
+                    CardUtils.validateDate(expiryDateController.text);
 
                 if (dateValidation != null) {
-                  // Handle invalid expiry date
                   showErrorDialog(context, 'Error', dateValidation);
                   return;
                 }
 
-                // Get the ID of the logged-in user
                 User? user = _auth.currentUser;
                 String? userId = user?.uid;
 
-                // Check if the card is already associated with the logged-in user
                 bool isCardAlreadyAdded = await checkIfCardExists(
                   userId!,
                   cardNumberController.text,
                 );
 
                 if (isCardAlreadyAdded) {
-                  // Show error dialog if the card is already added
                   showErrorDialog(
                     context,
                     'Error',
@@ -304,13 +294,12 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
                 }
 
                 PaymentCard paymentCard = PaymentCard(
-                    type: cardType!,
-                    number: cardNumberController.text,
-                    name: fullNameController.text,
-                    month: CardUtils.getExpiryDate(
-                        expiryDateController.text)[0],
-                    year: CardUtils.getExpiryDate(expiryDateController.text)[1],
-                    cvv: cvvController.text,
+                  type: cardType!,
+                  number: cardNumberController.text,
+                  name: fullNameController.text,
+                  month: CardUtils.getExpiryDate(expiryDateController.text)[0],
+                  year: CardUtils.getExpiryDate(expiryDateController.text)[1],
+                  cvv: cvvController.text,
                 );
 
                 try {
@@ -325,7 +314,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
 
                   Navigator.pop(context);
                 } catch (error) {
-                  // Handle errors
                   print('Error saving to Firebase: $error');
                   showErrorDialog(context, 'Error',
                       'Failed to save card. Please try again.');
@@ -339,7 +327,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
     );
   }
 
-  // Function to check if the card is already associated with the logged-in user
   Future<bool> checkIfCardExists(String userId, String cardNumber) async {
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection('cards')
@@ -350,7 +337,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
     return query.docs.isNotEmpty;
   }
 
-  // Function to show an error dialog
   void showErrorDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -371,7 +357,6 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
     );
   }
 
-  // Function to show a success dialog
   void showSuccessDialog(BuildContext context, PaymentCard paymentCard) {
     showDialog(
       context: context,
@@ -402,6 +387,4 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
       },
     );
   }
-
-
 }

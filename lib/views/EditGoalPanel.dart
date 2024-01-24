@@ -29,8 +29,10 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
-    _targetAmountController = TextEditingController(text: widget.initialTargetAmount.toString());
-    _currentAmountController = TextEditingController(text: widget.initialCurrentAmount.toString());
+    _targetAmountController =
+        TextEditingController(text: widget.initialTargetAmount.toString());
+    _currentAmountController =
+        TextEditingController(text: widget.initialCurrentAmount.toString());
   }
 
   @override
@@ -92,7 +94,6 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
           alignment: Alignment.center,
           child: ElevatedButton(
             onPressed: () async {
-              // Validate and save changes
               if (_validateFields()) {
                 await _updateGoal();
                 Navigator.pop(context);
@@ -106,11 +107,10 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
           alignment: Alignment.center,
           child: ElevatedButton(
             onPressed: () {
-              // Ask user if they want to discard changes
               _showDiscardChangesDialog();
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.red,
+              backgroundColor: Colors.red,
             ),
             child: Text('Cancel'),
           ),
@@ -119,10 +119,7 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
     );
   }
 
-
   bool _validateFields() {
-    // Add validation logic here
-    // Return true if fields are valid, otherwise false
     return true;
   }
 
@@ -131,7 +128,10 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
       double targetAmount = double.parse(_targetAmountController.text);
       double currentAmount = double.parse(_currentAmountController.text);
 
-      await FirebaseFirestore.instance.collection('goals').doc(widget.goalId).update({
+      await FirebaseFirestore.instance
+          .collection('goals')
+          .doc(widget.goalId)
+          .update({
         'name': _nameController.text,
         'amount': targetAmount,
         'currentAmount': currentAmount,
@@ -147,8 +147,8 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
   Future<void> _showDiscardChangesDialog() async {
     if (_nameController.text != widget.initialName ||
         _targetAmountController.text != widget.initialTargetAmount.toString() ||
-        _currentAmountController.text != widget.initialCurrentAmount.toString()) {
-      // Show dialog if changes are made
+        _currentAmountController.text !=
+            widget.initialCurrentAmount.toString()) {
       bool discardChanges = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -177,7 +177,6 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
         Navigator.pop(context);
       }
     } else {
-      // If no changes made, directly pop the screen
       Navigator.pop(context);
     }
   }

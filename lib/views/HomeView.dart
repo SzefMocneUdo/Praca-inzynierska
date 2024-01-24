@@ -18,7 +18,6 @@ class _HomeViewState extends State<HomeView> {
   List<ExpenseData> expenseDataList = [];
   List<ExpenseData> recentExpenses = [];
 
-  //List<ExpenseData> expensesMainCurrency = [];
   bool hasExpenses = false;
   bool hasExpenseWithUserCurrency = false;
   User? user = FirebaseAuth.instance.currentUser;
@@ -65,10 +64,8 @@ class _HomeViewState extends State<HomeView> {
   List<BarChartGroupData> generateBarGroups(List<ExpenseData> expenses) {
     List<BarChartGroupData> groups = [];
 
-    // Map to store the sum of expenses for each currency
     Map<String, double> currencySumMap = {};
 
-    // Iterate through expenses to calculate the sum for each currency
     for (int i = 0; i < expenses.length; i++) {
       String currency = expenses[i].currency;
       double amount = expenses[i].amount;
@@ -76,7 +73,6 @@ class _HomeViewState extends State<HomeView> {
       currencySumMap[currency] = (currencySumMap[currency] ?? 0.0) + amount;
     }
 
-    // Iterate through currencies and create BarChartGroupData
     for (int i = 0; i < currencies.length; i++) {
       String currency = currencies[i];
 
@@ -98,7 +94,6 @@ class _HomeViewState extends State<HomeView> {
     return groups;
   }
 
-
   Widget _buildBarChart() {
     return Column(
       children: [
@@ -109,7 +104,6 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-
         Expanded(
             child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -167,7 +161,7 @@ class _HomeViewState extends State<HomeView> {
 
     lineChartSpots = generateSpotsForLast7Days();
 
-    setState(() {}); // Aktualizacja interfejsu użytkownika po pobraniu danych
+    setState(() {});
   }
 
   void _getUserCurrency() async {
@@ -203,7 +197,6 @@ class _HomeViewState extends State<HomeView> {
         QuerySnapshot querySnapshot = await firestore
             .collection('expenses')
             .where('userId', isEqualTo: user.uid)
-            // .orderBy('date', descending: true)
             .limit(3)
             .get();
 
@@ -271,19 +264,15 @@ class _HomeViewState extends State<HomeView> {
   }
 
   List<FlSpot> generateSpotsForLast7Days() {
-    // Inicjalizacja punktów dla każdego dnia z ostatnich 7 dni
     List<FlSpot> spots =
         List.generate(7, (index) => FlSpot(index.toDouble(), 0));
 
-    // Iteracja po danych wydatków i aktualizacja punktów
     for (int i = 0; i < expensesData.length; i++) {
       DateTime date = expensesData[i]['date'];
       double amount = expensesData[i]['amount'].toDouble();
 
-      // Przyjmuję, że 'now' to dzisiaj, a więc biorę różnicę dni między datą wydatku a dzisiaj
       int daysAgo = DateTime.now().difference(date).inDays;
 
-      // Aktualizacja punktu na wykresie
       spots[daysAgo] = FlSpot(daysAgo.toDouble(), amount);
     }
 
@@ -314,8 +303,8 @@ class _HomeViewState extends State<HomeView> {
           child: Column(
             children: [
               hasExpenses ? _buildCarousel() : _buildWelcomeMessage(),
-              if(hasExpenses) _buildCarouselIndicators(),
-              if(hasExpenses)  _buildLatestExpensesList()
+              if (hasExpenses) _buildCarouselIndicators(),
+              if (hasExpenses) _buildLatestExpensesList()
             ],
           )),
     );
@@ -328,7 +317,7 @@ class _HomeViewState extends State<HomeView> {
         child: widget,
       );
 
-  Widget _buildCarousel(){
+  Widget _buildCarousel() {
     return CarouselSlider(
       carouselController: _carouselController,
       items: [_buildPieChart(), _buildLineChart(), _buildBarChart()],
@@ -366,7 +355,6 @@ class _HomeViewState extends State<HomeView> {
       children: indicators,
     );
   }
-
 
   Widget _buildLineChart() {
     return Column(
@@ -458,7 +446,6 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildPieChart() {
     return Column(
       children: [
-        // Sekcja: Nagłówek
         Padding(
           padding: const EdgeInsets.only(bottom: 30.0),
           child: Text(
@@ -466,7 +453,6 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        // Sekcja: Wykres z legendą
         Expanded(
           child: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
@@ -513,7 +499,6 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ),
-                    // Sekcja: Legenda
                     Container(
                       height: 50,
                       child: ListView.builder(

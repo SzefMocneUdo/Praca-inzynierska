@@ -25,6 +25,7 @@ class CardMonthInputFormatter extends TextInputFormatter {
         selection: TextSelection.collapsed(offset: string.length));
   }
 }
+
 class CardNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -50,4 +51,3 @@ class CardNumberInputFormatter extends TextInputFormatter {
     );
   }
 }
-

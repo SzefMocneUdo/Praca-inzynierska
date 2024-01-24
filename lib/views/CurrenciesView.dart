@@ -2,11 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
-import '../model/Currency.dart';
+
 import 'CurrencyConverterScreen.dart';
 import 'FollowExchangeRatesScreen.dart';
 import 'NotificationsView.dart';
-
 
 class CurrenciesView extends StatefulWidget {
   const CurrenciesView({Key? key});
@@ -245,7 +244,6 @@ class _CurrenciesViewState extends State<CurrenciesView> {
 
                                   return Dismissible(
                                     key: Key('$from$to$rate'),
-                                    // Klucz do identyfikowania elementu Dismissible
                                     background: Container(
                                       color: Colors.red,
                                       alignment: Alignment.centerRight,
@@ -261,7 +259,6 @@ class _CurrenciesViewState extends State<CurrenciesView> {
                                               DismissDirection.endToStart ||
                                           direction ==
                                               DismissDirection.startToEnd) {
-                                        // Confirm deletion
                                         bool confirmDelete = await showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
@@ -298,8 +295,7 @@ class _CurrenciesViewState extends State<CurrenciesView> {
                                               DismissDirection.endToStart ||
                                           direction ==
                                               DismissDirection.startToEnd) {
-                                        _deleteCurrencyRate(from, to,
-                                            userId); // Implementacja usuwania przelicznika
+                                        _deleteCurrencyRate(from, to, userId);
                                       }
                                     },
                                     child: ListTile(

@@ -2,19 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../model/VirtualPiggyBank.dart';
 import 'EditGoalPanel.dart';
-
-class VirtualPiggyBank {
-  final String userId;
-  final String name;
-  final double targetAmount;
-  final double currentAmount;
-  final String currency;
-  final String id;
-
-  VirtualPiggyBank(
-      this.userId, this.name, this.targetAmount, this.currentAmount, this.currency, this.id);
-}
 
 class GoalsView extends StatefulWidget {
   const GoalsView({Key? key}) : super(key: key);
@@ -36,10 +25,7 @@ class _GoalsViewState extends State<GoalsView> {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Navigate to the notifications view
-              // Replace with your navigation logic
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -49,13 +35,13 @@ class _GoalsViewState extends State<GoalsView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(),
-            ); // Loading indicator while data is being fetched
+            );
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text('No goals available'),
-            ); // Inform the user that there are no goals
+            );
           } else {
             List<VirtualPiggyBank> userGoals = snapshot.data!;
             return ListView.builder(
@@ -64,9 +50,9 @@ class _GoalsViewState extends State<GoalsView> {
                 return Dismissible(
                   key: Key(userGoals[index].id),
                   background: Container(
-                    color: Colors.green, // Zmiana koloru na zielony
+                    color: Colors.green,
                     child: Icon(
-                      Icons.edit, // Zmiana ikony na olówek
+                      Icons.edit,
                       color: Colors.white,
                       size: 36.0,
                     ),
@@ -74,9 +60,9 @@ class _GoalsViewState extends State<GoalsView> {
                     padding: EdgeInsets.only(left: 16.0),
                   ),
                   secondaryBackground: Container(
-                    color: Colors.red, // Zmiana koloru na czerwony
+                    color: Colors.red,
                     child: Icon(
-                      Icons.delete, // Zmiana ikony na kosz
+                      Icons.delete,
                       color: Colors.white,
                       size: 36.0,
                     ),
@@ -85,13 +71,13 @@ class _GoalsViewState extends State<GoalsView> {
                   ),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.endToStart) {
-                      // Confirm deletion
                       return await showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text('Delete Goal?'),
-                            content: Text('Are you sure you want to delete this goal?'),
+                            content: Text(
+                                'Are you sure you want to delete this goal?'),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -110,14 +96,12 @@ class _GoalsViewState extends State<GoalsView> {
                         },
                       );
                     } else if (direction == DismissDirection.startToEnd) {
-                      // Edit goal
                       _editGoal(userGoals[index]);
                     }
                     return false;
                   },
                   onDismissed: (direction) {
                     if (direction == DismissDirection.endToStart) {
-                      // Delete goal
                       _deleteGoal(userGoals[index]);
                     }
                   },
@@ -141,7 +125,6 @@ class _GoalsViewState extends State<GoalsView> {
             .where('userId', isEqualTo: user.uid)
             .get();
 
-        // Ensure the widget is still mounted before updating the state
         if (mounted) {
           List<VirtualPiggyBank> userGoals = goalsSnapshot.docs.map((doc) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -231,7 +214,6 @@ class _GoalsViewState extends State<GoalsView> {
 
   void _deleteGoal(VirtualPiggyBank piggyBank) async {
     try {
-      // Delete goal from Firebase
       await _firestore.collection('goals').doc(piggyBank.id).delete();
       print('Goal deleted successfully!');
     } catch (error) {

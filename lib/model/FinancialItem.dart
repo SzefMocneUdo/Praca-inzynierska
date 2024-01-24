@@ -1,4 +1,3 @@
-// Bazowa klasa dla obiektów finansowych
 class FinancialItem {
   final String userId;
   final String name;

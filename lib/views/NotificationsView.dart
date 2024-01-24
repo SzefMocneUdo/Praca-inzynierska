@@ -28,4 +28,3 @@ class _NotificationsViewState extends State<NotificationsView> {
     );
   }
 }
-

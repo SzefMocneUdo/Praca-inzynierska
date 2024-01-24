@@ -179,7 +179,8 @@ class _UpdatePasswordViewState extends State<UpdatePasswordView> {
             Padding(
               padding: EdgeInsets.all(8),
               child: _buildTextField(
-                  label: "New password", controller: _repeatNewPasswordController),
+                  label: "New password",
+                  controller: _repeatNewPasswordController),
             ),
             SizedBox(height: 8),
             ElevatedButton(

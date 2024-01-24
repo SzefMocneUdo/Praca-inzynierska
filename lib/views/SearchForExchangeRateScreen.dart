@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:live_currency_rate/live_currency_rate.dart';
 
 import 'CurrenciesView.dart';
@@ -80,7 +79,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _fromController,
                   onChanged: (String? newValue) {
@@ -89,7 +88,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                     });
                   },
                   items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
+                      currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -129,7 +128,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                   value: _toController,
                   onChanged: (String? newValue) {
@@ -138,7 +137,7 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                     });
                   },
                   items:
-                  currencies.map<DropdownMenuItem<String>>((String value) {
+                      currencies.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -162,15 +161,13 @@ class _CurrencyConvrterScreenState extends State<CurrencyConvrterScreen> {
                 child: TextField(
                   controller: _amountController,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                  ),
+                  decoration: InputDecoration(),
                   style: TextStyle(
-                    fontSize: 20, // Powiększenie tekstu pola
+                    fontSize: 20,
                   ),
                 ),
                 width: 300,
               ),
-
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {

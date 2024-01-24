@@ -1,54 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/routes.dart';
-
-class CustomUser {
-  final String uid;
-  final String email;
-  final String username;
-  final String hashedPassword;
-  final String currency;
-
-  CustomUser({
-    required this.uid,
-    required this.email,
-    required this.username,
-    required this.hashedPassword,
-    required this.currency,
-  });
-
-  factory CustomUser.fromFirebaseUser(
-      User user, String username, String currency) {
-    return CustomUser(
-      uid: user.uid,
-      email: user.email!,
-      username: username,
-      hashedPassword: generateHashedPassword(user.uid, user.email!),
-      currency: currency,
-    );
-  }
-
-  Future<void> saveUserToFirestore() async {
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'username': username,
-        'email': email,
-        'hashedPassword': hashedPassword,
-        'currency': currency
-      });
-    } catch (e) {
-      print('Error saving user to Firestore: $e');
-    }
-  }
-
-  static String generateHashedPassword(String uid, String email) {
-    // Implement the hash function (e.g., SHA-256) securely
-    return 'hash_function_result';
-  }
-}
+import '../model/CustomUser.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -157,8 +112,7 @@ class _RegisterViewState extends State<RegisterView> {
               emailIconColor = Colors.grey;
               passwordIconColor = Colors.grey;
               confirmPasswordIconColor = Colors.grey;
-            }
-            else if (controller == _email) {
+            } else if (controller == _email) {
               usernameBorderColor = Colors.grey;
               emailBorderColor = Colors.blue;
               passwordBorderColor = Colors.grey;
@@ -192,37 +146,6 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  void _showRequirementsDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Registration Requirements'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('- Minimum 10 characters required for username'),
-              Text('- Only letters and digits allowed for username'),
-              Text('- Valid email format'),
-              Text('- Minimum 8 characters required for password'),
-              Text(
-                  '- Password must contain at least one digit, one special character, and one uppercase letter'),
-              Text('- Passwords must match'),
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _showEmailVerificationDialog() {
     showDialog(
@@ -241,7 +164,6 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: () async {
                   User? user = FirebaseAuth.instance.currentUser;
                   if (user != null && !user.emailVerified) {
-                    // Navigator.of(context).pop(); // Zamknij obecny AlertDialog
                     await user.sendEmailVerification();
                     _showEmailSentDialog();
                   }
@@ -424,7 +346,7 @@ class _RegisterViewState extends State<RegisterView> {
                   onTapIcon: () {
                     setState(() {
                       _obscureConfirmPassword = !_obscureConfirmPassword;
-                    }); // Dodanie wywołania CurrencyPicker
+                    });
                   },
                   borderColor: confirmPasswordBorderColor,
                   iconColor: confirmPasswordIconColor,
@@ -450,7 +372,7 @@ class _RegisterViewState extends State<RegisterView> {
                           color: Colors.grey,
                         ),
                         onPressed: () {
-                          _openCurrencyPicker(); // Wywołanie funkcji otwierającej CurrencyPicker
+                          _openCurrencyPicker();
                         },
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -488,19 +410,16 @@ class _RegisterViewState extends State<RegisterView> {
                           return;
                         }
 
-                        // Kontynuuj rejestrację
                         final userCredential = await FirebaseAuth.instance
                             .createUserWithEmailAndPassword(
                           email: email,
                           password: password,
                         );
 
-                        // Twórz obiekt użytkownika i zapisuj do Firestore
                         final customUser = CustomUser.fromFirebaseUser(
                             userCredential.user!, username, _selectedCurrency);
                         await customUser.saveUserToFirestore();
 
-                        // Wysyłaj email weryfikacyjny
                         await userCredential.user?.sendEmailVerification();
                         _showEmailVerificationDialog();
                       } on FirebaseAuthException catch (e) {

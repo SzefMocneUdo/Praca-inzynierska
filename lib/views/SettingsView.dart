@@ -6,6 +6,8 @@ import 'package:untitled/main.dart';
 import 'package:untitled/views/FaqView.dart';
 import 'package:untitled/views/NotificationsView.dart';
 import 'package:untitled/views/UpdateEmailView.dart';
+
+import 'CalendarView.dart';
 import 'UpdatePasswordView.dart';
 
 class SettingsView extends StatefulWidget {
@@ -27,16 +29,16 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void getUserDataFromFirebase() async {
-    // Pobierz zalogowanego użytkownika
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Pobierz dodatkowe dane o użytkowniku z Firestore
-      DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
 
       if (userData.exists) {
         setState(() {
-          // Zaktualizuj stan username
           username = userData['username'];
         });
       }
@@ -53,7 +55,8 @@ class _SettingsViewState extends State<SettingsView> {
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationsView()));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => NotificationsView()));
             },
           )
         ],
@@ -63,16 +66,17 @@ class _SettingsViewState extends State<SettingsView> {
         child: ListView(
           children: [
             SizedBox(height: 20),
-            // Username
             if (username != null && username!.isNotEmpty)
               Center(
                 child: Text(
                   'Welcome, $username!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue),
                 ),
               ),
             SizedBox(height: 10),
-            // "How can we help you?" section
             Center(
               child: Text(
                 'How can we help You?',
@@ -80,7 +84,6 @@ class _SettingsViewState extends State<SettingsView> {
               ),
             ),
             SizedBox(height: 20),
-            // "My Account" section
             buildSectionTitle("My Account"),
             buildOption(context, "Change Password", () {
               Navigator.push(
@@ -95,18 +98,17 @@ class _SettingsViewState extends State<SettingsView> {
               );
             }),
             SizedBox(height: 20),
-            // "Features" section
             buildSectionTitle("Features"),
             buildOption(context, "Calendar", () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => FaqView()),
+                context,
+                MaterialPageRoute(builder: (context) => CalendarView()),
               );
             }),
             buildOption(context, "Cards", () {
               Navigator.pushNamed(context, cardsRoute);
             }),
             SizedBox(height: 20),
-            // "Support" section
             buildSectionTitle("Support"),
             buildOption(context, "FAQ", () {
               Navigator.push(
@@ -114,16 +116,12 @@ class _SettingsViewState extends State<SettingsView> {
                 MaterialPageRoute(builder: (context) => FaqView()),
               );
             }),
-            buildOption(context, "Contact", () {
-            }),
+            buildOption(context, "Contact", () {}),
             SizedBox(height: 20),
             SizedBox(height: 20),
-            // "Account Management" section
             buildSectionTitle("Account Management"),
-            buildOption(context, "Close Account", () {
-            }),
+            buildOption(context, "Close Account", () {}),
             SizedBox(height: 20),
-            // Logout option
             buildLogoutOption(context),
           ],
         ),
@@ -141,7 +139,8 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  GestureDetector buildOption(BuildContext context, String title, VoidCallback onTap) {
+  GestureDetector buildOption(
+      BuildContext context, String title, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -151,7 +150,10 @@ class _SettingsViewState extends State<SettingsView> {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600]),
             ),
             Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ],
@@ -169,7 +171,7 @@ class _SettingsViewState extends State<SettingsView> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
-                (route) => false,
+            (route) => false,
           );
         }
       },
@@ -187,7 +189,10 @@ class _SettingsViewState extends State<SettingsView> {
                 SizedBox(width: 10),
                 Text(
                   "Logout",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.red),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.red),
                 ),
               ],
             ),
@@ -211,7 +216,8 @@ class _SettingsViewState extends State<SettingsView> {
                 Navigator.of(context).pop(false);
               },
               child: const Text('Cancel'),
-            ), TextButton(
+            ),
+            TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },

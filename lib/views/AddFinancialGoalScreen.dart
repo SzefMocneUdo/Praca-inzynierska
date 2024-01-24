@@ -1,30 +1,30 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../model/Currency.dart';
 
-class AddGoalScreen extends StatefulWidget {
+class AddFinancialGoalScreen extends StatefulWidget {
   @override
-  _AddGoalScreenState createState() => _AddGoalScreenState();
+  _AddFinancialGoalScreenState createState() => _AddFinancialGoalScreenState();
 }
 
-class _AddGoalScreenState extends State<AddGoalScreen> {
+class _AddFinancialGoalScreenState extends State<AddFinancialGoalScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   DateTime? selectedDate;
 
   final CollectionReference goalsCollection =
-  FirebaseFirestore.instance.collection('goals');
+      FirebaseFirestore.instance.collection('goals');
 
   List<Currency> currencies = [
     Currency(code: 'USD', name: 'US Dollar'),
     Currency(code: 'EUR', name: 'Euro'),
     Currency(code: 'GBP', name: 'British Pound'),
-    // Dodaj inne waluty według potrzeb
   ];
 
   Currency? selectedCurrency;
@@ -52,7 +52,6 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
   }
 
   void _addGoal(BuildContext context) async {
-    // Validate form data
     if (nameController.text.isEmpty ||
         amountController.text.isEmpty ||
         selectedCurrency == null ||
@@ -66,10 +65,8 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
       return;
     }
 
-    // Parse amount to double
     double amount = double.tryParse(amountController.text) ?? 0;
 
-    // Check if amount is a valid number
     if (amount.isNaN || amount.isInfinite) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -80,37 +77,29 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
       return;
     }
 
-    // Generate goal ID
     String goalId = await _generateGoalId();
 
-    // Create Goal object
     Map<String, dynamic> goalData = {
       'name': nameController.text,
       'amount': amount,
       'currency': selectedCurrency!.code,
       'deadline': Timestamp.fromDate(selectedDate!),
-      'id':goalId
+      'id': goalId
     };
 
     try {
-      // Add goal to Firebase
       await goalsCollection.doc(goalId).set({
         ...goalData,
         'userId': FirebaseAuth.instance.currentUser?.uid,
       });
-
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Financial goal added successfully!'),
           duration: Duration(seconds: 2),
         ),
       );
-
-      // Close the screen and return to the previous screen
       Navigator.pop(context, true);
     } catch (error) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding financial goal. Please try again.'),
@@ -125,7 +114,7 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Financial Goal'),
-        backgroundColor: Colors.blueAccent,  // Set the background color to blue
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -151,7 +140,7 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
                 });
               },
               items: currencies.map<DropdownMenuItem<Currency>>(
-                    (Currency currency) {
+                (Currency currency) {
                   return DropdownMenuItem<Currency>(
                     value: currency,
                     child: Text(currency.name),

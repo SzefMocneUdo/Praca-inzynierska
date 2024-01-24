@@ -3,47 +3,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../model/PaymentCard.dart';
 import 'card_components/CardStyles.dart';
 import 'card_components/CardUtilis.dart';
-
-class PaymentCard {
-  final CardType type;
-  final String number;
-  final String name;
-  final int month;
-  final int year;
-  final String cvv;
-
-  PaymentCard({
-    required this.type,
-    required this.number,
-    required this.name,
-    required this.month,
-    required this.year,
-    required this.cvv,
-  });
-}
 
 class CardListView extends StatefulWidget {
   @override
   _CardListViewState createState() => _CardListViewState();
 }
+
 class _CardListViewState extends State<CardListView> {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  List<bool> showBackList = []; // Lista flag showBack dla każdej karty
+  List<bool> showBackList = [];
   late Future<List<PaymentCard>> _creditCardsFuture;
 
   @override
   void initState() {
     super.initState();
-    _initShowBackList(); // Inicjalizacja listy flag showBack
-    _creditCardsFuture = _getCreditCards(); // Initialize the future
+    _initShowBackList();
+    _creditCardsFuture = _getCreditCards();
   }
 
   void _initShowBackList() {
-    // Utwórz listę flag showBack tylko raz przed pętlą
     setState(() {
-      showBackList.clear(); // Wyczyść listę, aby uniknąć błędów w przypadku aktualizacji stanu
+      showBackList.clear();
     });
   }
 
@@ -81,8 +64,10 @@ class _CardListViewState extends State<CardListView> {
                       cardHolderName: card.name,
                       cvv: card.cvv,
                       showBackSide: showBackList[index],
-                      frontBackground: CardStyles.customGradient(CardStyles.blueGradient),
-                      backBackground: CardStyles.customGradient(CardStyles.blueGradient),
+                      frontBackground:
+                          CardStyles.customGradient(CardStyles.blueGradient),
+                      backBackground:
+                          CardStyles.customGradient(CardStyles.blueGradient),
                       showShadow: true,
                       textExpDate: 'Exp. Date',
                       textName: 'Card Holder',

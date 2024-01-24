@@ -1,4 +1,3 @@
-// AddExpenseScreen class
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,7 +68,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     setState(() {
                       _selectedDate = pickedDate;
                       _dateController.text =
-                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },
@@ -223,7 +222,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       controller: _currencyTextField,
       readOnly: true,
       decoration: InputDecoration(
-        hintText: _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
+        hintText:
+            _selectedCurrency != null ? _selectedCurrency!.name : 'Currency',
         prefixIcon: Icon(
           Icons.attach_money,
           color: Colors.grey,

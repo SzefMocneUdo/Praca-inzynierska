@@ -1,32 +1,7 @@
-// card_utils.dart
 import 'package:awesome_card/extra/card_type.dart';
 import 'package:flutter/material.dart';
 
 import 'CardStrings.dart';
-
-class PaymentCard {
-  CardType? type;
-  String? number;
-  String? name;
-  int? month;
-  int? year;
-  String? cvv;
-
-  PaymentCard({
-    this.type,
-    this.number,
-    this.name,
-    this.month,
-    this.year,
-    this.cvv,
-  });
-
-  @override
-  String toString() {
-    return '[Type: $type, Number: $number, Name: $name, Month: $month, Year: $year, CVV: $cvv]';
-  }
-}
-
 
 class CardUtils {
   static String? validateCVV(String? value) {
@@ -216,8 +191,7 @@ class CardUtils {
     final rMaestro = RegExp(r'^(5[06789]|6)[0-9]{0,}$');
     final rRupay = RegExp(r'^(6522|6521|60)[0-9]{0,}$');
     final rVisa = RegExp(r'^4[0-9]{0,}$');
-    final rElo = RegExp(
-        r'^(4011(78|79)|43(1274|8935)|45(1416|7393|763(1|2))'
+    final rElo = RegExp(r'^(4011(78|79)|43(1274|8935)|45(1416|7393|763(1|2))'
         r'|50(4175|6699|67[0-7][0-9]|9000)|50(9[0-9][0-9][0-9])'
         r'|627780|63(6297|6368)|650(03([^4])|04([0-9])|05(0|1)'
         r'|05([7-9])|06([0-9])|07([0-9])|08([0-9])|4([0-3][0-9]'
@@ -225,7 +199,6 @@ class CardUtils {
         r'|7([0-2][0-9])|541|700|720|727|901)|65165([2-9])|6516([6-7][0-9])'
         r'|65500([0-9])|6550([0-5][0-9])|655021|65505([6-7])|6516([8-9][0-9])|65170([0-4]))');
 
-    // Remove all the spaces from the card number
     cardNumber = cardNumber.trim().replaceAll(' ', '');
 
     if (rAmericanExpress.hasMatch(cardNumber)) {
@@ -237,11 +210,6 @@ class CardUtils {
     } else if (rDinersClub.hasMatch(cardNumber)) {
       return CardType.dinersClub;
     } else if (rRupay.hasMatch(cardNumber)) {
-      // Additional check to see if it's a discover card
-      // Some discover card starts with 6011 and some rupay card starts with 60
-      // If the card number matches the 6011 then it must be discover.
-
-      // Note: Keep rupay check before the discover check
       if (rDiscover.hasMatch(cardNumber)) {
         return CardType.discover;
       } else {

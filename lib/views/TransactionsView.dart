@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +121,7 @@ class _TransactionsState extends State<Transactions> {
           )
         else
           SizedBox(
-            height: 600, // Set a fixed height or adjust as needed
+            height: 600,
             child: SingleChildScrollView(
               child: DataTable(
                 columns: [
@@ -132,7 +130,7 @@ class _TransactionsState extends State<Transactions> {
                 ],
                 rows: financialData.map<DataRow>((financialItem) {
                   Color amountColor =
-                  financialItem is Income ? Colors.green : Colors.red;
+                      financialItem is Income ? Colors.green : Colors.red;
 
                   return DataRow(
                     cells: [
@@ -160,8 +158,6 @@ class _TransactionsState extends State<Transactions> {
     );
   }
 
-
-
   Widget _buildFinancialListIncomes(List<Income> income) {
     income.sort((a, b) => b.date.compareTo(a.date));
 
@@ -180,7 +176,7 @@ class _TransactionsState extends State<Transactions> {
           )
         else
           SizedBox(
-            height: 600, // Set a fixed height or adjust as needed
+            height: 600,
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: DataTable(
@@ -217,7 +213,6 @@ class _TransactionsState extends State<Transactions> {
     );
   }
 
-
   Widget _buildFinancialListExpense(List<Expense> financialData) {
     financialData.sort((a, b) => b.date.compareTo(a.date));
 
@@ -236,7 +231,7 @@ class _TransactionsState extends State<Transactions> {
           )
         else
           SizedBox(
-            height: 600, // Set a fixed height or adjust as needed
+            height: 600,
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: DataTable(
@@ -272,7 +267,6 @@ class _TransactionsState extends State<Transactions> {
       ],
     );
   }
-
 
   void _showExpenseDetails(Expense expense) {
     FinancialItemDetailsDialog(financialItem: expense).show(context);

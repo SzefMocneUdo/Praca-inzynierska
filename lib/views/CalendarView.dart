@@ -10,12 +10,12 @@ import '../model/Expense.dart';
 import '../model/FinancialItem.dart';
 import '../model/Income.dart';
 
-class TransactionCalendar extends StatefulWidget {
+class CalendarView extends StatefulWidget {
   @override
-  _TransactionCalendarState createState() => _TransactionCalendarState();
+  _CalendarViewState createState() => _CalendarViewState();
 }
 
-class _TransactionCalendarState extends State<TransactionCalendar> {
+class _CalendarViewState extends State<CalendarView> {
   Map<DateTime, List<FinancialItem>> transactionsByDate = {};
   List<FinancialItem> allFinancialData = [];
   DateTime focusedDay = DateTime.now();
@@ -172,7 +172,8 @@ class _TransactionCalendarState extends State<TransactionCalendar> {
           return ListTile(
             title: Text(transaction.name),
             subtitle: Text(transaction is Expense ? 'Expense' : 'Income'),
-            trailing: Text('${transaction.currency} ${transaction.amount.toStringAsFixed(2)}'),
+            trailing: Text(
+                '${transaction.currency} ${transaction.amount.toStringAsFixed(2)}'),
             onTap: () {
               FinancialItemDetailsDialog(financialItem: transaction)
                   .show(context);

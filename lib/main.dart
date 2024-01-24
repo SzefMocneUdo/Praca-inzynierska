@@ -8,18 +8,16 @@ import 'package:untitled/views/BottomMenuView.dart';
 import 'package:untitled/views/CalendarView.dart';
 import 'package:untitled/views/CardListView.dart';
 import 'package:untitled/views/CurrenciesView.dart';
+import 'package:untitled/views/FaqView.dart';
 import 'package:untitled/views/GoalsView.dart';
-import 'package:untitled/views/HelpView.dart';
 import 'package:untitled/views/LoginView.dart';
 import 'package:untitled/views/NotificationsView.dart';
 import 'package:untitled/views/PrivacyAndSecurityView.dart';
-import 'package:untitled/views/SettingsView.dart';
 import 'package:untitled/views/RegisterView.dart';
+import 'package:untitled/views/SettingsView.dart';
 import 'package:untitled/views/TransactionsView.dart';
 import 'package:untitled/views/UpdatePasswordView.dart';
 import 'package:untitled/views/VerifyEmailView.dart';
-
-
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,12 +37,12 @@ void main() {
       goalsRoute: (context) => GoalsView(),
       notificationsRoute: (context) => NotificationsView(),
       settingsRoute: (context) => SettingsView(),
+      calendarRoute: (context) => CalendarView(),
       privacyAndSecurityRoute: (context) => PrivacyAndSecurityView(),
-      helpRoute: (context) => HelpView(),
       updatePasswordRoute: (context) => UpdatePasswordView(),
       creditCard: (context) => AddCreditCardScreen(),
       cardsRoute: (context) => CardListView(),
-      calendarRoute: (context) =>TransactionCalendar()
+      faqRoute: (context) => FaqView()
     },
   ));
 }
@@ -55,20 +53,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      builder: (context, snapshot){
-        switch (snapshot.connectionState){
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
           case ConnectionState.done:
-           final user = FirebaseAuth.instance.currentUser;
-             return const LoginView();
-           //}
+            FirebaseAuth.instance.currentUser;
+            return const LoginView();
           default:
             return const CircularProgressIndicator();
         }
-      }, future: Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ),
+      },
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
     );
   }
 }
-
-

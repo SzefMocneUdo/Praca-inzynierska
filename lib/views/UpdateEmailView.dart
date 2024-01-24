@@ -77,8 +77,9 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
         } else {
           bool isAvailable = await isEmailAvailable(value);
           if (isAvailable) {
-            bool isPasswordCorrect = await verifyCurrentPassword(_passwordController.text);
-            if(isPasswordCorrect){
+            bool isPasswordCorrect =
+                await verifyCurrentPassword(_passwordController.text);
+            if (isPasswordCorrect) {
               await FirebaseAuth.instance.currentUser!
                   .reauthenticateWithCredential(
                 EmailAuthProvider.credential(
@@ -90,13 +91,12 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
               _messages.add('E-mail updated successfully');
               _showDialog(_messages, "Done!");
               _messages = [];
-            } else{
+            } else {
               _messages.add('Password is not correct');
               _showDialog(_messages, "Error");
               _messages = [];
               print(_passwordController.text);
             }
-
           } else {
             _messages.add('E-mail is already taken');
             _showDialog(_messages, "Error");
@@ -111,10 +111,10 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
     }
   }
 
-
   Future<bool> verifyCurrentPassword(String password) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: FirebaseAuth.instance.currentUser!.email!,
         password: password,
       );
@@ -208,7 +208,8 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
               child: _buildTextField(
                   label: "New e-mail",
                   controller: _newEmailController,
-                  hintText: "New e-mail", obscureText: false),
+                  hintText: "New e-mail",
+                  obscureText: false),
             ),
             SizedBox(height: 8),
             Padding(
@@ -233,7 +234,8 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
               child: _buildTextField(
                   label: "New e-mail",
                   controller: _repeatNewEmailController,
-                  hintText: "New e-mail", obscureText: false),
+                  hintText: "New e-mail",
+                  obscureText: false),
             ),
             SizedBox(height: 8),
             Padding(
@@ -258,7 +260,8 @@ class _UpdateEmailViewState extends State<UpdateEmailView> {
               child: _buildTextField(
                   label: "Password",
                   controller: _passwordController,
-                  hintText: "Password", obscureText: true),
+                  hintText: "Password",
+                  obscureText: true),
             ),
             ElevatedButton(
               onPressed: () async {

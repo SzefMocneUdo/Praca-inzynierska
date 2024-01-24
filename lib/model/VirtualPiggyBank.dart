@@ -6,5 +6,6 @@ class VirtualPiggyBank {
   final String currency;
   final String id;
 
-  VirtualPiggyBank(this.userId,this.name, this.targetAmount, this.currentAmount, this.currency, this.id);
+  VirtualPiggyBank(this.userId, this.name, this.targetAmount,
+      this.currentAmount, this.currency, this.id);
 }

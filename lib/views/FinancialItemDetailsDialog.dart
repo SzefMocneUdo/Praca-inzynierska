@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/Expense.dart';
@@ -30,14 +29,15 @@ class FinancialItemDetailsDialog {
                 SizedBox(height: 10),
                 Text('Name: ${financialItem.name}'),
                 Text('Date: ${_formattedDate(financialItem.date)}'),
-                Text('Amount: ${financialItem.amount} ${financialItem.currency}'),
-                if (financialItem is Expense)
-                  ...[
-                    Text('Category: ${(financialItem as Expense).category}'),
-                    Text('Description: ${(financialItem as Expense).description}'),
-                    Text('Payment Method: ${(financialItem as Expense).paymentMethod}'),
-                  ]
-                else if (financialItem is Income)
+                Text(
+                    'Amount: ${financialItem.amount} ${financialItem.currency}'),
+                if (financialItem is Expense) ...[
+                  Text('Category: ${(financialItem as Expense).category}'),
+                  Text(
+                      'Description: ${(financialItem as Expense).description}'),
+                  Text(
+                      'Payment Method: ${(financialItem as Expense).paymentMethod}'),
+                ] else if (financialItem is Income)
                   Text('(No additional details for income)'),
                 SizedBox(height: 10),
                 ElevatedButton(

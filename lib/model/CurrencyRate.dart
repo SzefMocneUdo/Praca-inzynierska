@@ -1,4 +1,4 @@
- class CurrencyRate {
+class CurrencyRate {
   String from;
   String to;
   String userId;

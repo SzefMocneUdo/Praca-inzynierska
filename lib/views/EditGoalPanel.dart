@@ -48,6 +48,16 @@ class _EditGoalPanelState extends State<EditGoalPanel> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Goal'),
+        backgroundColor: Colors.blueAccent,
+        leading: GestureDetector(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

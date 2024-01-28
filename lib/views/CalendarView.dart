@@ -261,7 +261,7 @@ class _CalendarViewState extends State<CalendarView> {
           SizedBox(height: 16),
           ElevatedButton(
             onPressed: _filterTransactionsByDateRange,
-            child: Text('Pokaż'),
+            child: Text('Show'),
           ),
         ],
       ),
